@@ -2,32 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Search / will display always -->
-    <item android:id="@+id/action_search"
-        android:icon="@drawable/ic_action_search"
-        android:title="search"
-        app:showAsAction="ifRoom"/>
-
     <!-- Location Found -->
-    <item android:id="@+id/action_location_found"
-        android:icon="@drawable/ic_action_search"
-        android:title="location"
-        app:showAsAction="ifRoom" />
-
-    <!-- Refresh -->
-    <item android:id="@+id/action_refresh"
-        android:icon="@drawable/ic_action_edit"
-        android:title="refresh"
+    <View
+        android:layout_width="5dp"
+        android:layout_height="5dp"
+        android:background="@color/colorPrimary"
+        android:focusable="false" />
+    <item
+        android:id="@+id/action_location_found"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="Salvar"
         app:showAsAction="ifRoom" />
 
     <!-- Help -->
-    <item android:id="@+id/action_help"
+    <item android:id="@+id/action_salvar"
         android:icon="@drawable/ic_action_camera"
-        android:title="help"
+        android:title="Trocar Usuário"
         app:showAsAction="never"/>
 
     <!-- Check updates -->
-    <item android:id="@+id/action_check_updates"
+    <item android:id="@+id/action_sair"
         android:icon="@drawable/ic_action_copy"
-        android:title="update"
+        android:title="Sair do Aplicativo"
         app:showAsAction="never" />
 </menu>
