@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!-- Search / will display always -->
-    <!-- Location Found -->
-    <View
-        android:layout_width="5dp"
-        android:layout_height="5dp"
-        android:background="@color/colorPrimary"
-        android:focusable="false" />
-    <item
-        android:id="@+id/action_location_found"
-        android:icon="@android:drawable/ic_menu_save"
-        android:title="Salvar"
-        app:showAsAction="ifRoom" />
 
-    <!-- Help -->
+    <item android:id="@+id/action_alt"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Alterar Título"
+        app:showAsAction="always" />
+    <item android:id="@+id/action_list"
+        android:title="Lista das Configurações"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_add"
+        android:title="Adicionar Configuração"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_del"
+        android:title="Excluir Configuração"
+        app:showAsAction="never"/>
     <item android:id="@+id/action_salvar"
-        android:icon="@drawable/ic_action_camera"
         android:title="Trocar Usuário"
         app:showAsAction="never"/>
-
-    <!-- Check updates -->
     <item android:id="@+id/action_sair"
-        android:icon="@drawable/ic_action_copy"
         android:title="Sair do Aplicativo"
         app:showAsAction="never" />
 </menu>
