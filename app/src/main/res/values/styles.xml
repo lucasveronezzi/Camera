@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -7,10 +6,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
-
-    <style name="ThemeDivider" parent="Theme.AppCompat.Light">
-        <item name="android:listDivider">@android:color/holo_blue_bright</item>
-        <item name="android:textColorSecondary">@android:color/holo_blue_bright</item>
+    <style name="ThemeMain" parent="Theme.AppCompat.Light">
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 </resources>
