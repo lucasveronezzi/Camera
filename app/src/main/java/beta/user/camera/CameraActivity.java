@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 
-public class Main2Activity extends AppCompatActivity {
+public class CameraActivity extends AppCompatActivity {
     private boolean flag_contaGota;
     private GradientDrawable rlBack;
     private LayoutImageCamera layoutImage;
@@ -27,7 +27,7 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         flag_contaGota = false;
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_camera);
         createLayoutImage();
 
        /* View mContentView = findViewById(R.id.layout_fullscreen);

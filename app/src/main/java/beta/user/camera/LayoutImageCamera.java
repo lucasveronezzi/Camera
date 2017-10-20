@@ -48,6 +48,7 @@ public class LayoutImageCamera extends LinearLayout {
 
     private int move_mode = MOVE_NONE;
     private float oldDist = 1f;
+    private float oldScale = 0;
     public GradientDrawable backColorSeguranca;
 
     public LayoutImageCamera(Context context) {
@@ -133,6 +134,7 @@ public class LayoutImageCamera extends LinearLayout {
 
     public void resize(){
         rect = new Rect(0, 0, area_witdh,area_height);
+        btmpAreaSegura = Bitmap.createBitmap(area_witdh, area_height, Bitmap.Config.ARGB_8888);
     }
 
     private float spacing(MotionEvent event) {
@@ -206,6 +208,16 @@ public class LayoutImageCamera extends LinearLayout {
                         float newDist = spacing(event);
                         if (newDist > 10f) {
                             float scale = newDist - oldDist;
+                            float tot = scale - oldScale;
+                            if(tot > 10 || tot < -10){
+                                area_witdh += tot;
+                                area_height += tot;
+                                area_x -= tot/2;
+                                area_y -= tot/2;
+                                oldScale = scale;
+                                resize();
+                                drawShape();
+                            }
                             Log.i("scale",Float.toString(scale));
                         }
                     }

@@ -6,7 +6,7 @@
     android:id="@+id/layout_fullscreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="beta.user.camera.Main2Activity">
+    tools:context="beta.user.camera.CameraActivity">
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/fab_menu"
