@@ -26,6 +26,7 @@
             android:id="@+id/fechar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="click_closeApp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             fab:fab_label="Fechar App"
             fab:fab_size="mini" />
@@ -44,7 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_crop"
-            fab:fab_label="Formato"
+            android:onClick="click_showFormatos"
+            fab:fab_label="Formatos"
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -65,6 +67,46 @@
 
     </com.github.clans.fab.FloatingActionMenu>
 
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/formato_quadrado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/corArea_view"
+        android:layout_marginTop="200dp"
+        android:layout_marginLeft="5dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_conta_gota"
+        app:fab_showAnimation="@anim/fab_slide_out_to_right"
+        app:fab_hideAnimation="@anim/fab_slide_in_from_right"
+        fab:fab_label="Quadrado"
+        fab:fab_size="mini" />
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/formato_circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/corArea_view"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="255dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_conta_gota"
+        app:fab_showAnimation="@anim/fab_slide_out_to_right"
+        app:fab_hideAnimation="@anim/fab_slide_in_from_right"
+        fab:fab_label="Circulo"
+        fab:fab_size="mini" />
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/formato_oval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/corArea_view"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="310dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_conta_gota"
+        app:fab_showAnimation="@anim/fab_slide_out_to_right"
+        app:fab_hideAnimation="@anim/fab_slide_in_from_right"
+        fab:fab_label="Oval"
+        fab:fab_size="mini" />
+
     <RelativeLayout
         android:id="@+id/corArea_view"
         android:layout_width="30dp"
@@ -74,4 +116,5 @@
         android:layout_marginStart="10dp"
         android:background="@drawable/button_border">
     </RelativeLayout>
+
 </RelativeLayout>

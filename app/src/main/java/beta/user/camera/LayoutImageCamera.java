@@ -3,6 +3,7 @@ package beta.user.camera;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -25,22 +26,12 @@ import android.widget.RelativeLayout;
 
 import java.io.File;
 
+import beta.user.camera.ShapePack.CircleShape;
+
 public class LayoutImageCamera extends LinearLayout {
     private int[] cor_areaSegura = new int[4];
-    private Bitmap btmpOrig;
-    private Bitmap btmpShadown;
-    private Bitmap btmpAreaSegura;
-    private Bitmap btmpShow;
-    private Canvas canvasShow;
-    private Paint paintInsideStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Rect rect;
-    private ImageView viewCamera;
-    private int area_x = 200;
-    private int area_y = 200;
-    private int area_center;
-    private int area_witdh = 150;
-    private int area_height = 150;
 
+    private ImageView viewCamera;
 
     static final int MOVE_NONE = 0;
     static final int MOVE_DRAG = 1;
@@ -50,6 +41,8 @@ public class LayoutImageCamera extends LinearLayout {
     private float oldDist = 1f;
     private float oldScale = 0;
     public GradientDrawable backColorSeguranca;
+
+    private CircleShape shape;
 
     public LayoutImageCamera(Context context) {
         super(context);
@@ -80,87 +73,41 @@ public class LayoutImageCamera extends LinearLayout {
         initialize();
     }
 
+    private void updateImage(){
+        shape.drawShape();
+        viewCamera.setImageBitmap(shape.getBtmpShow());
+    }
+
     private void initialize(){
-        paintInsideStroke.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
-        paintInsideStroke.setStrokeWidth(5f);
-        paintInsideStroke.setStyle(Paint.Style.STROKE);
-        paintInsideStroke.setColor(Color.RED);
-        paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
-
-
         File dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
         if(dir.exists()){
-            btmpOrig =  BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true);
-            rect = new Rect(0, 0, area_witdh,area_height);
-            setBitMaps();
-            btmpAreaSegura = Bitmap.createBitmap(area_witdh, area_height, Bitmap.Config.ARGB_8888);
-            drawShape();
+            shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+            shape.drawShape();
+            viewCamera.setImageBitmap(shape.getBtmpShow());
         }
-    }
-    public void setBitMaps(){
-        btmpShadown = btmpOrig.copy(Bitmap.Config.ARGB_8888, true);
-        Canvas canvas = new Canvas(btmpShadown);
-        RectF outerRectangle = new RectF(0, 0, btmpShadown.getWidth(), btmpShadown.getHeight());
-        Paint paintOuside = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintOuside.setColor(Color.BLACK);
-        paintOuside.setAlpha(64);
-        canvas.drawRect(outerRectangle, paintOuside);
-        btmpShow = btmpShadown.copy(Bitmap.Config.ARGB_8888, true);
-        canvasShow = new Canvas(btmpShow);
-    }
-    public void drawShape(){
-        getCroppedBitmap(Bitmap.createBitmap(btmpOrig,area_x, area_y,area_witdh, area_height));
-
-        canvasShow.drawBitmap(btmpShadown,0, 0,null);
-        canvasShow.drawBitmap(btmpAreaSegura,area_x,area_y,null);
-        viewCamera.setImageBitmap(btmpShow);
-    }
-    public void getCroppedBitmap(Bitmap bitmap) {
-        Canvas canvas = new Canvas(btmpAreaSegura);
-        canvas.drawARGB(0, 0, 0, 0);
-
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        canvas.drawCircle(area_witdh / 2, area_height / 2,
-                area_witdh / 2, paint);
-
-        paint.setColor(Color.RED);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        canvas.drawCircle(area_witdh / 2,area_height/ 2,
-                area_witdh / 2, paintInsideStroke);
-    }
-
-    public void resize(){
-        rect = new Rect(0, 0, area_witdh,area_height);
-        btmpAreaSegura = Bitmap.createBitmap(area_witdh, area_height, Bitmap.Config.ARGB_8888);
     }
 
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float)Math.sqrt(x * x + y * y);
-
     }
 
     public void setEventoContaGota(){
-        viewCamera.setImageBitmap(btmpOrig);
+        viewCamera.setImageBitmap(shape.getBtmpOrig());
         viewCamera.setOnTouchListener(null);
         viewCamera.setOnTouchListener(touchEvent_contaGota);
     }
     public void delEventContaGota(){
         viewCamera.setOnTouchListener(null);
         viewCamera.setOnTouchListener(touchEvent_Move);
-        drawShape();
+        updateImage();
     }
 
     private OnTouchListener touchEvent_contaGota = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-
-                Log.i("touch", Integer.toString((int) event.getX()));
-                int pixel = btmpOrig.getPixel((int) event.getX(), (int) event.getY());
+                int pixel = shape.getBtmpOrig().getPixel((int) event.getX(), (int) event.getY());
                 cor_areaSegura[0] = Color.alpha(pixel);
                 cor_areaSegura[1] = Color.red(pixel);
                 cor_areaSegura[2] = Color.green(pixel);
@@ -178,6 +125,7 @@ public class LayoutImageCamera extends LinearLayout {
             Log.i("Y",Float.toString(event.getY()));
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
+                    LayoutScreen.hideFab();
                     move_mode = MOVE_DRAG;
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN:
@@ -188,35 +136,58 @@ public class LayoutImageCamera extends LinearLayout {
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if(move_mode == MOVE_DRAG){
-                        area_x = (int)event.getX();
-                        if(area_x - area_witdh/2 < 1)
-                           area_x = area_witdh/2+1;
-                        else if(area_x + area_witdh/2 > viewCamera.getWidth())
-                            area_x = viewCamera.getWidth() - 1 - area_witdh/2;
-                        area_y = (int)event.getY();
-                        if(area_y - area_height/2 < 1)
-                            area_y = area_height/2 +1;
-                        else if(area_y + area_height/2 > viewCamera.getHeight())
-                            area_y = viewCamera.getHeight() - 1 - area_height/2;
+                        shape.x = (int)event.getX();
+                        if(shape.x < 0)
+                            shape.x = 0 ;
+                        else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
+                            shape.x = shape.getBtmpOrig().getWidth() - shape.width;
+                        shape.y = (int)event.getY();
+                        if(shape.y < 0)
+                            shape.y = 0;
+                        else if(shape.y + shape.height >  shape.getBtmpOrig().getHeight())
+                            shape.y = shape.getBtmpOrig().getHeight() - shape.height;
 
                         Log.i("GetW",Float.toString(viewCamera.getWidth()));
                         Log.i("GetH",Float.toString(viewCamera.getHeight()));
-                        Log.i("GetX",Float.toString(area_x));
-                        Log.i("GetY",Float.toString(area_y));
-                        drawShape();
+                        Log.i("GetX",Float.toString(shape.x));
+                        Log.i("GetY",Float.toString(shape.y));
+                        updateImage();
                     }else if(move_mode == MOVE_ZOOM && event.getPointerCount() == 2){
                         float newDist = spacing(event);
                         if (newDist > 10f) {
                             float scale = newDist - oldDist;
                             float tot = scale - oldScale;
                             if(tot > 10 || tot < -10){
-                                area_witdh += tot;
-                                area_height += tot;
-                                area_x -= tot/2;
-                                area_y -= tot/2;
                                 oldScale = scale;
-                                resize();
-                                drawShape();
+                                shape.width += tot;
+                                shape.height += tot;
+                                if(shape.width > shape.getBtmpOrig().getWidth()){
+                                    shape.width = shape.getBtmpOrig().getWidth();
+                                    break;
+                                }else if(shape.width < 10f) {
+                                    shape.width = 10f;
+                                    break;
+                                }
+                                if( shape.height > shape.getBtmpOrig().getHeight() ) {
+                                    shape.height = shape.getBtmpOrig().getHeight();
+                                    break;
+                                }else if(shape.height < 10f) {
+                                    shape.height = 10f;
+                                    break;
+                                }
+
+
+                                shape.x -= tot/2;
+                                if(shape.x < 0) shape.x = 0;
+                                else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
+                                    shape.x = shape.getBtmpOrig().getWidth() - shape.width;;
+
+                                shape.y -= tot/2;
+                                if(shape.y < 0) shape.y = 0;
+                                else if(shape.y +  shape.height > shape.getBtmpOrig().getHeight())
+                                    shape.y = shape.getBtmpOrig().getHeight() - shape.height;;
+                                shape.resize();
+                                updateImage();
                             }
                             Log.i("scale",Float.toString(scale));
                         }

@@ -1,12 +1,14 @@
 package beta.user.camera;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,17 +19,18 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-public class CameraActivity extends AppCompatActivity {
-    private boolean flag_contaGota;
-    private GradientDrawable rlBack;
+public class CameraActivity extends AppCompatActivity{
+    public static boolean flag_contaGota = false;
     private LayoutImageCamera layoutImage;
+    private LayoutScreen layoutScreen;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        flag_contaGota = false;
-        setContentView(R.layout.activity_camera);
+        layoutScreen = new LayoutScreen(this);
+        setContentView(layoutScreen);
         createLayoutImage();
 
        /* View mContentView = findViewById(R.id.layout_fullscreen);
@@ -40,32 +43,29 @@ public class CameraActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);*/
 
         getSupportActionBar().setTitle("Titulo");
-
-        ViewGroup view = (ViewGroup)findViewById(android.R.id.content);
-        view.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN && flag_contaGota) {
-                    Rect viewRect = new Rect();
-                    layoutImage.getGlobalVisibleRect(viewRect);
-                    if (!viewRect.contains((int) event.getRawX(), (int) event.getRawY())) {
-                        layoutImage.delEventContaGota();
-                        flag_contaGota = false;
-                    }
-                }
-                return true;
-            }
-        });
-
     }
 
+    public void click_showFormatos(View v){
+        FloatingActionButton fb = (FloatingActionButton)findViewById(R.id.formato_quadrado);
+        if(fb.getLabelVisibility() == View.VISIBLE) {
+            LayoutScreen.hideButtonFormato();
+        }else{
+            LayoutScreen.showButtonFormato();
+        }
+    }
     public void click_contaGota(View v){
-        FloatingActionMenu button = (FloatingActionMenu)findViewById(R.id.fab_menu);
-        button.close(true);
+        LayoutScreen.hideFab();
         flag_contaGota = true;
         layoutImage.setEventoContaGota();
         Toast.makeText(this,"Clique em cima da cor",Toast.LENGTH_LONG).show();
     }
+    public void click_closeApp(View v){
+        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+        homeIntent.addCategory( Intent.CATEGORY_HOME );
+        homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(homeIntent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -82,12 +82,19 @@ public class CameraActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        layoutScreen.inicialize(layoutImage);
+    }
     private void createLayoutImage(){
-        RelativeLayout rl = (RelativeLayout)findViewById(R.id.layout_fullscreen);
         layoutImage = new LayoutImageCamera(this);
+        RelativeLayout rl = (RelativeLayout)findViewById(R.id.layout_fullscreen);
         rl.addView(layoutImage);
         rl.bringChildToFront(findViewById(R.id.fab_menu));
+        rl.bringChildToFront(findViewById(R.id.formato_circle));
+        rl.bringChildToFront(findViewById(R.id.formato_quadrado));
+        rl.bringChildToFront(findViewById(R.id.formato_oval));
         rl.bringChildToFront(findViewById(R.id.corArea_view));
         layoutImage.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
     }
@@ -115,4 +122,5 @@ public class CameraActivity extends AppCompatActivity {
 
         builder.show();
     }
+
 }
