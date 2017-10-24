@@ -3,15 +3,7 @@ package beta.user.camera;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -37,10 +29,13 @@ public class LayoutImageCamera extends LinearLayout {
     static final int MOVE_DRAG = 1;
     static final int MOVE_ZOOM = 2;
 
+    public int idShape = 0;
     private int move_mode = MOVE_NONE;
     private float oldDist = 1f;
     private float oldScale = 0;
     public GradientDrawable backColorSeguranca;
+
+    private File dir;
 
     private CircleShape shape;
 
@@ -79,7 +74,7 @@ public class LayoutImageCamera extends LinearLayout {
     }
 
     private void initialize(){
-        File dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
+        dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
         if(dir.exists()){
             shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
             shape.drawShape();
@@ -91,6 +86,20 @@ public class LayoutImageCamera extends LinearLayout {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float)Math.sqrt(x * x + y * y);
+    }
+
+    public void setShape(int id){
+        switch (id){
+            case 0:
+                shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+                shape.drawShape();
+                viewCamera.setImageBitmap(shape.getBtmpShow());
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+        }
     }
 
     public void setEventoContaGota(){

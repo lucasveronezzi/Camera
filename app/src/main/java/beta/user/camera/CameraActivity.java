@@ -2,30 +2,24 @@ package beta.user.camera;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 
 public class CameraActivity extends AppCompatActivity{
     public static boolean flag_contaGota = false;
     private LayoutImageCamera layoutImage;
     private LayoutScreen layoutScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,12 +40,7 @@ public class CameraActivity extends AppCompatActivity{
     }
 
     public void click_showFormatos(View v){
-        FloatingActionButton fb = (FloatingActionButton)findViewById(R.id.formato_quadrado);
-        if(fb.getLabelVisibility() == View.VISIBLE) {
-            LayoutScreen.hideButtonFormato();
-        }else{
-            LayoutScreen.showButtonFormato();
-        }
+        createDialogFormatos();
     }
     public void click_contaGota(View v){
         LayoutScreen.hideFab();
@@ -77,7 +66,7 @@ public class CameraActivity extends AppCompatActivity{
         int id = item.getItemId();
         switch (id){
             case R.id.action_alt:
-                createDialog();
+                createDialogEditTitle();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -92,14 +81,11 @@ public class CameraActivity extends AppCompatActivity{
         RelativeLayout rl = (RelativeLayout)findViewById(R.id.layout_fullscreen);
         rl.addView(layoutImage);
         rl.bringChildToFront(findViewById(R.id.fab_menu));
-        rl.bringChildToFront(findViewById(R.id.formato_circle));
-        rl.bringChildToFront(findViewById(R.id.formato_quadrado));
-        rl.bringChildToFront(findViewById(R.id.formato_oval));
         rl.bringChildToFront(findViewById(R.id.corArea_view));
         layoutImage.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
     }
 
-    public void createDialog(){
+    public void createDialogEditTitle(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Alterar Título");
         final EditText input = new EditText(this);
@@ -114,6 +100,29 @@ public class CameraActivity extends AppCompatActivity{
             }
         });
         builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    public void createDialogFormatos(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setTitle("Formato da Área de Segurança")
+                .setSingleChoiceItems(R.array.ArrayFormatos,layoutImage.idShape, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        layoutImage.setShape(which);
+                        layoutImage.idShape = which;
+                    }
+                });
+
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();

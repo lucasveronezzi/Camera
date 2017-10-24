@@ -3,15 +3,12 @@ package beta.user.camera;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 /**
@@ -21,10 +18,6 @@ import com.github.clans.fab.FloatingActionMenu;
 public class LayoutScreen extends RelativeLayout {
     private LayoutImageCamera layoutImage;
     private static FloatingActionMenu fbMenu;
-    private static FloatingActionButton fbFormatos;
-    private static FloatingActionButton fbQuadrado;
-    private static FloatingActionButton fbCircle;
-    private static FloatingActionButton fbOval;
     private Rect fabRect;
     public LayoutScreen(Context context) {
         super(context);
@@ -49,30 +42,10 @@ public class LayoutScreen extends RelativeLayout {
         layoutImage = img;
         fbMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         fabRect = new Rect();
-        fbQuadrado = (FloatingActionButton)findViewById(R.id.formato_quadrado);
-        fbCircle = (FloatingActionButton)findViewById(R.id.formato_circle);
-        fbOval = (FloatingActionButton)findViewById(R.id.formato_oval);
-        fbFormatos = (FloatingActionButton)findViewById(R.id.formato);
-    }
-
-    public static void showButtonFormato() {
-        fbQuadrado.setVisibility(VISIBLE);
-        fbCircle.setVisibility(VISIBLE);
-        fbOval.setVisibility(VISIBLE);
-        fbFormatos.setLabelVisibility(GONE);
-        fbFormatos.setLabelText(null);
-    }
-    public static void hideButtonFormato(){
-        fbQuadrado.setVisibility(GONE);
-        fbCircle.setVisibility(GONE);
-        fbOval.setVisibility(GONE);
-        fbFormatos.setLabelVisibility(VISIBLE);
-        fbFormatos.setLabelText("Formatos");
     }
 
     public static void hideFab(){
         if(fbMenu.isShown()){
-            hideButtonFormato();
             fbMenu.close(true);
         }
     }
@@ -91,12 +64,6 @@ public class LayoutScreen extends RelativeLayout {
                     }
                 fbMenu.getGlobalVisibleRect(fabRect);
                 if (fabRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-                    if(fbMenu.isOpened()){
-                        fbFormatos.setLabelVisibility(VISIBLE);
-                        fbFormatos.setLabelText("Formatos");
-                    }else{
-                        hideButtonFormato();
-                    }
 
                 }
                 break;
