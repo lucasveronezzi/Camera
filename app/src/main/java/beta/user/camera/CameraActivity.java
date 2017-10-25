@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 public class CameraActivity extends AppCompatActivity{
     public static boolean flag_contaGota = false;
-    private LayoutImageCamera layoutImage;
     private LayoutScreen layoutScreen;
 
     @Override
@@ -25,7 +24,6 @@ public class CameraActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         layoutScreen = new LayoutScreen(this);
         setContentView(layoutScreen);
-        createLayoutImage();
 
        /* View mContentView = findViewById(R.id.layout_fullscreen);
         mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
@@ -43,9 +41,9 @@ public class CameraActivity extends AppCompatActivity{
         createDialogFormatos();
     }
     public void click_contaGota(View v){
-        LayoutScreen.hideFab();
+        layoutScreen.hideFab();
         flag_contaGota = true;
-        layoutImage.setEventoContaGota();
+        layoutScreen.setEventoContaGota();
         Toast.makeText(this,"Clique em cima da cor",Toast.LENGTH_LONG).show();
     }
     public void click_closeApp(View v){
@@ -74,15 +72,7 @@ public class CameraActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        layoutScreen.inicialize(layoutImage);
-    }
-    private void createLayoutImage(){
-        layoutImage = new LayoutImageCamera(this);
-        RelativeLayout rl = (RelativeLayout)findViewById(R.id.layout_fullscreen);
-        rl.addView(layoutImage);
-        rl.bringChildToFront(findViewById(R.id.fab_menu));
-        rl.bringChildToFront(findViewById(R.id.corArea_view));
-        layoutImage.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
+        layoutScreen.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
     }
 
     public void createDialogEditTitle(){
@@ -113,11 +103,11 @@ public class CameraActivity extends AppCompatActivity{
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Formato da Área de Segurança")
-                .setSingleChoiceItems(R.array.ArrayFormatos,layoutImage.idShape, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(R.array.ArrayFormatos,layoutScreen.idShape, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        layoutImage.setShape(which);
-                        layoutImage.idShape = which;
+                        layoutScreen.setShape(which);
+                        layoutScreen.idShape = which;
                     }
                 });
 

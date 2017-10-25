@@ -1,24 +1,49 @@
 package beta.user.camera;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.github.clans.fab.FloatingActionMenu;
 
-/**
- * Created by Lucas on 21/10/2017.
- */
+import java.io.File;
+
+import beta.user.camera.ShapePack.CircleShape;
 
 public class LayoutScreen extends RelativeLayout {
-    private LayoutImageCamera layoutImage;
-    private static FloatingActionMenu fbMenu;
+    private FloatingActionMenu fbMenu;
     private Rect fabRect;
+
+    private int[] cor_areaSegura = new int[4];
+
+    private ImageView viewCamera;
+
+    static final int MOVE_NONE = 0;
+    static final int MOVE_DRAG = 1;
+    static final int MOVE_ZOOM = 2;
+
+    public int idShape = 0;
+    private int move_mode = MOVE_NONE;
+    private float oldDist = 1f;
+    private float oldScale = 0;
+    public GradientDrawable backColorSeguranca;
+
+    private File dir;
+
+    private CircleShape shape;
+
     public LayoutScreen(Context context) {
         super(context);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -28,26 +53,63 @@ public class LayoutScreen extends RelativeLayout {
         LayoutInflater inflater = LayoutInflater.from(context);
         View inflatedLayout= inflater.inflate(R.layout.activity_camera, null, false);
         addView(inflatedLayout);
-    }
 
-    public LayoutScreen(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public LayoutScreen(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public void inicialize(LayoutImageCamera img){
-        layoutImage = img;
         fbMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         fabRect = new Rect();
+        viewCamera = new ImageView(context);
+        inicialize();
     }
 
-    public static void hideFab(){
+    public void inicialize(){
+        viewCamera.setLayoutParams(
+                new ViewGroup.LayoutParams( ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        viewCamera.setAdjustViewBounds(true);
+        ((LinearLayout)findViewById(R.id.layoutImage)).addView(viewCamera);
+        viewCamera.setOnTouchListener(touchEvent_Move);
+        dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
+
+        if(dir.exists()){
+            shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+            shape.drawShape();
+            viewCamera.setImageBitmap(shape.getBtmpShow());
+        }
+
+    }
+
+    public void hideFab(){
         if(fbMenu.isShown()){
             fbMenu.close(true);
         }
+    }
+
+    private void updateImage(){
+        shape.drawShape();
+        viewCamera.setImageBitmap(shape.getBtmpShow());
+    }
+
+    public void setShape(int id){
+        switch (id){
+            case 0:
+                shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+                shape.drawShape();
+                viewCamera.setImageBitmap(shape.getBtmpShow());
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+        }
+    }
+
+    public void setEventoContaGota(){
+        viewCamera.setImageBitmap(shape.getBtmpOrig());
+        viewCamera.setOnTouchListener(null);
+        viewCamera.setOnTouchListener(touchEvent_contaGota);
+    }
+    public void delEventContaGota(){
+        viewCamera.setOnTouchListener(null);
+        viewCamera.setOnTouchListener(touchEvent_Move);
+        updateImage();
     }
 
     @Override
@@ -56,9 +118,9 @@ public class LayoutScreen extends RelativeLayout {
             case MotionEvent.ACTION_DOWN:
                     if (CameraActivity.flag_contaGota) {
                         Rect viewRect = new Rect();
-                        layoutImage.getGlobalVisibleRect(viewRect);
+                        viewCamera.getGlobalVisibleRect(viewRect);
                         if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-                            layoutImage.delEventContaGota();
+                            delEventContaGota();
                             CameraActivity.flag_contaGota = false;
                         }
                     }
@@ -71,4 +133,109 @@ public class LayoutScreen extends RelativeLayout {
         }
         return false;
     }
+
+    private float spacing(MotionEvent event) {
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        return (float)Math.sqrt(x * x + y * y);
+    }
+
+    private OnTouchListener touchEvent_contaGota = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int pixel = shape.getBtmpOrig().getPixel((int) event.getX(), (int) event.getY());
+            cor_areaSegura[0] = Color.alpha(pixel);
+            cor_areaSegura[1] = Color.red(pixel);
+            cor_areaSegura[2] = Color.green(pixel);
+            cor_areaSegura[3] = Color.blue(pixel);
+            backColorSeguranca.setColor(pixel);
+            delEventContaGota();
+            return false;
+        }
+    };
+
+    private OnTouchListener touchEvent_Move = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            Log.i("X",Float.toString(event.getX()));
+            Log.i("Y",Float.toString(event.getY()));
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    hideFab();
+                    move_mode = MOVE_DRAG;
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    oldDist = spacing(event);
+                    if (oldDist > 10f) {
+                        move_mode = MOVE_ZOOM;
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if(move_mode == MOVE_DRAG){
+                        shape.x = (int)event.getX();
+                        if(shape.x < 0)
+                            shape.x = 0 ;
+                        else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
+                            shape.x = shape.getBtmpOrig().getWidth() - shape.width;
+                        shape.y = (int)event.getY();
+                        if(shape.y < 0)
+                            shape.y = 0;
+                        else if(shape.y + shape.height >  shape.getBtmpOrig().getHeight())
+                            shape.y = shape.getBtmpOrig().getHeight() - shape.height;
+
+                        Log.i("GetW",Float.toString(viewCamera.getWidth()));
+                        Log.i("GetH",Float.toString(viewCamera.getHeight()));
+                        Log.i("GetX",Float.toString(shape.x));
+                        Log.i("GetY",Float.toString(shape.y));
+                        updateImage();
+                    }else if(move_mode == MOVE_ZOOM && event.getPointerCount() == 2){
+                        float newDist = spacing(event);
+                        if (newDist > 10f) {
+                            float scale = newDist - oldDist;
+                            float tot = scale - oldScale;
+                            if(tot > 10 || tot < -10){
+                                oldScale = scale;
+                                shape.width += tot;
+                                shape.height += tot;
+                                if(shape.width > shape.getBtmpOrig().getWidth()){
+                                    shape.width = shape.getBtmpOrig().getWidth();
+                                    break;
+                                }else if(shape.width < 10f) {
+                                    shape.width = 10f;
+                                    break;
+                                }
+                                if( shape.height > shape.getBtmpOrig().getHeight() ) {
+                                    shape.height = shape.getBtmpOrig().getHeight();
+                                    break;
+                                }else if(shape.height < 10f) {
+                                    shape.height = 10f;
+                                    break;
+                                }
+
+
+                                shape.x -= tot/2;
+                                if(shape.x < 0) shape.x = 0;
+                                else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
+                                    shape.x = shape.getBtmpOrig().getWidth() - shape.width;;
+
+                                shape.y -= tot/2;
+                                if(shape.y < 0) shape.y = 0;
+                                else if(shape.y +  shape.height > shape.getBtmpOrig().getHeight())
+                                    shape.y = shape.getBtmpOrig().getHeight() - shape.height;;
+                                shape.resize();
+                                updateImage();
+                            }
+                            Log.i("scale",Float.toString(scale));
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_UP: //first finger lifted
+                case MotionEvent.ACTION_POINTER_UP: //second finger lifted
+                    move_mode = MOVE_NONE;
+                    break;
+            }
+            return true;
+        }
+
+    };
 }
