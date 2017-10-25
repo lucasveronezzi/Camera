@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class CameraActivity extends AppCompatActivity{
@@ -46,7 +45,7 @@ public class CameraActivity extends AppCompatActivity{
         layoutScreen.setEventoContaGota();
         Toast.makeText(this,"Clique em cima da cor",Toast.LENGTH_LONG).show();
     }
-    public void click_closeApp(View v){
+    public void click_closeApp(){
         Intent homeIntent = new Intent(Intent.ACTION_MAIN);
         homeIntent.addCategory( Intent.CATEGORY_HOME );
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -65,6 +64,9 @@ public class CameraActivity extends AppCompatActivity{
         switch (id){
             case R.id.action_alt:
                 createDialogEditTitle();
+                break;
+            case R.id.action_sair:
+                click_closeApp();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -108,6 +110,7 @@ public class CameraActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialog, int which) {
                         layoutScreen.setShape(which);
                         layoutScreen.idShape = which;
+
                     }
                 });
 
@@ -115,6 +118,7 @@ public class CameraActivity extends AppCompatActivity{
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                layoutScreen.hideFab();
                 dialog.cancel();
             }
         });

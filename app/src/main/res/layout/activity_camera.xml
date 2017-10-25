@@ -23,15 +23,6 @@
         fab:menu_openDirection="down">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fechar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="click_closeApp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            fab:fab_label="Fechar App"
-            fab:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/conta_gota"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,7 +38,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="click_showFormatos"
-            android:src="@drawable/ic_quadrado"
             fab:fab_label="Formatos"
             fab:fab_size="mini" />
 

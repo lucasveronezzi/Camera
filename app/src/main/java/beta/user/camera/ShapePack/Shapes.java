@@ -14,12 +14,14 @@ import android.graphics.RectF;
  * Created by Lucas on 20/10/2017.
  */
 
-public class Shapes extends Canvas{
+public abstract class Shapes extends Canvas{
     public float x = 200;
     public float y = 200;
     public float center;
     public float width = 150;
     public float height = 150;
+
+    public abstract void drawShapeFormat();
 
     public Rect rect;
     public Paint paintInsideStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -32,11 +34,11 @@ public class Shapes extends Canvas{
     public Canvas canAreaS;
 
     public Shapes(Bitmap btmp){
-        paintInsideStroke.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
+        paintInsideStroke.setPathEffect(new DashPathEffect(new float[] {25,10}, 0));
         paintInsideStroke.setStrokeWidth(5f);
         paintInsideStroke.setStyle(Paint.Style.STROKE);
         paintInsideStroke.setColor(Color.RED);
-        paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT));
+        paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
         updateBitmap(btmp);
         resize();
@@ -44,6 +46,7 @@ public class Shapes extends Canvas{
 
     public void drawShape(){
         drawBitmap(btmpShadown,0, 0,null);
+        drawShapeFormat();
         drawBitmap(btmpAreaS,x,y,null);
     }
 

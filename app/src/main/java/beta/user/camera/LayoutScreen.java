@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,11 +15,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.io.File;
 
 import beta.user.camera.ShapePack.CircleShape;
+import beta.user.camera.ShapePack.OvalShape;
+import beta.user.camera.ShapePack.RecShape;
+import beta.user.camera.ShapePack.Shapes;
 
 public class LayoutScreen extends RelativeLayout {
     private FloatingActionMenu fbMenu;
@@ -42,7 +45,7 @@ public class LayoutScreen extends RelativeLayout {
 
     private File dir;
 
-    private CircleShape shape;
+    private Shapes shape;
 
     public LayoutScreen(Context context) {
         super(context);
@@ -66,12 +69,11 @@ public class LayoutScreen extends RelativeLayout {
         viewCamera.setAdjustViewBounds(true);
         ((LinearLayout)findViewById(R.id.layoutImage)).addView(viewCamera);
         viewCamera.setOnTouchListener(touchEvent_Move);
+        fbMenu.bringToFront();
         dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
 
         if(dir.exists()){
-            shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
-            shape.drawShape();
-            viewCamera.setImageBitmap(shape.getBtmpShow());
+            setShape(0);
         }
 
     }
@@ -92,11 +94,20 @@ public class LayoutScreen extends RelativeLayout {
             case 0:
                 shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
                 shape.drawShape();
+                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_circle);
                 viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
             case 1:
+                shape = new RecShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+                shape.drawShape();
+                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_rect);
+                viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
             case 2:
+                shape = new OvalShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
+                shape.drawShape();
+                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_elipse);
+                viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
         }
     }
@@ -211,7 +222,6 @@ public class LayoutScreen extends RelativeLayout {
                                     shape.height = 10f;
                                     break;
                                 }
-
 
                                 shape.x -= tot/2;
                                 if(shape.x < 0) shape.x = 0;

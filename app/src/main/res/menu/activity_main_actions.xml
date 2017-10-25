@@ -19,7 +19,7 @@
     <item android:id="@+id/action_salvar"
         android:title="Trocar Usuário"
         app:showAsAction="never"/>
-    <item android:id="@+id/action_sair"
-        android:title="Sair do Aplicativo"
-        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_sair"
+        android:title="Sair do Aplicativo" />
 </menu>
