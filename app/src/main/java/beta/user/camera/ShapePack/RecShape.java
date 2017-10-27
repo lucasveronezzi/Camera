@@ -8,16 +8,21 @@ import android.graphics.Paint;
  */
 
 public class RecShape extends Shapes {
+    private final Paint pain1 = new Paint();
     public RecShape(Bitmap btmp) {
         super(btmp);
+        pain1.setAntiAlias(true);
     }
 
     @Override
     public void drawShapeFormat() {
         canAreaS.drawARGB(0, 0, 0, 0);
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, paint);
+        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, pain1);
         canAreaS.drawRect(rect,paintInsideStroke);
+    }
+
+    @Override
+    public void resizeFormat() {
+
     }
 }

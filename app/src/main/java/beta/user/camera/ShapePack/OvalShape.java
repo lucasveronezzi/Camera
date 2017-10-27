@@ -6,13 +6,14 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 
-/**
- * Created by User on 25/10/2017.
- */
-
 public class OvalShape extends Shapes {
+    private final Paint paint1 = new Paint();
+    private final Paint paint2 = new Paint();
     public OvalShape(Bitmap btmp) {
         super(btmp);
+        paint1.setAntiAlias(true);
+        paint2.setAntiAlias(true);
+        paint2.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
     }
 
     @Override
@@ -21,13 +22,15 @@ public class OvalShape extends Shapes {
 
         RectF rectF = new RectF(0,0,100,150);
 
-        final Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        canAreaS.drawOval(rectF,paint);
+        canAreaS.drawOval(rectF,paint1);
 
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, paint);
+        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, paint2);
 
         canAreaS.drawOval(rectF, paintInsideStroke);
+    }
+
+    @Override
+    public void resizeFormat() {
+
     }
 }

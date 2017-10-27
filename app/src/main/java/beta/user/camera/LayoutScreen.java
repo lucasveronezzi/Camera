@@ -35,11 +35,13 @@ public class LayoutScreen extends RelativeLayout {
 
     static final int MOVE_NONE = 0;
     static final int MOVE_DRAG = 1;
-    static final int MOVE_ZOOM = 2;
+    static final int MOVE_RESIZE = 2;
 
     public int idShape = 0;
     private int move_mode = MOVE_NONE;
     private float oldDist = 1f;
+    private float oldX = 0;
+    private float oldY = 0;
     private float oldScale = 0;
     public GradientDrawable backColorSeguranca;
 
@@ -173,33 +175,29 @@ public class LayoutScreen extends RelativeLayout {
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     hideFab();
+                    oldX = event.getX();
+                    oldY = event.getY();
                     move_mode = MOVE_DRAG;
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN:
                     oldDist = spacing(event);
                     if (oldDist > 10f) {
-                        move_mode = MOVE_ZOOM;
+                        move_mode = MOVE_RESIZE;
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if(move_mode == MOVE_DRAG){
-                        shape.x = (int)event.getX();
-                        if(shape.x < 0)
-                            shape.x = 0 ;
-                        else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
-                            shape.x = shape.getBtmpOrig().getWidth() - shape.width;
-                        shape.y = (int)event.getY();
-                        if(shape.y < 0)
-                            shape.y = 0;
-                        else if(shape.y + shape.height >  shape.getBtmpOrig().getHeight())
-                            shape.y = shape.getBtmpOrig().getHeight() - shape.height;
+                        shape.x = shape.x + event.getX() - oldX;
+                        shape.y = shape.y + event.getY() - oldY;
 
                         Log.i("GetW",Float.toString(viewCamera.getWidth()));
                         Log.i("GetH",Float.toString(viewCamera.getHeight()));
                         Log.i("GetX",Float.toString(shape.x));
                         Log.i("GetY",Float.toString(shape.y));
+                        oldX = event.getX();
+                        oldY = event.getY();
                         updateImage();
-                    }else if(move_mode == MOVE_ZOOM && event.getPointerCount() == 2){
+                    }else if(move_mode == MOVE_RESIZE && event.getPointerCount() == 2){
                         float newDist = spacing(event);
                         if (newDist > 10f) {
                             float scale = newDist - oldDist;
@@ -222,17 +220,10 @@ public class LayoutScreen extends RelativeLayout {
                                     shape.height = 10f;
                                     break;
                                 }
+                                shape.resize();
 
                                 shape.x -= tot/2;
-                                if(shape.x < 0) shape.x = 0;
-                                else if(shape.x +  shape.width > shape.getBtmpOrig().getWidth())
-                                    shape.x = shape.getBtmpOrig().getWidth() - shape.width;;
-
                                 shape.y -= tot/2;
-                                if(shape.y < 0) shape.y = 0;
-                                else if(shape.y +  shape.height > shape.getBtmpOrig().getHeight())
-                                    shape.y = shape.getBtmpOrig().getHeight() - shape.height;;
-                                shape.resize();
                                 updateImage();
                             }
                             Log.i("scale",Float.toString(scale));

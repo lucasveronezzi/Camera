@@ -22,6 +22,7 @@ public abstract class Shapes extends Canvas{
     public float height = 150;
 
     public abstract void drawShapeFormat();
+    public abstract void resizeFormat();
 
     public Rect rect;
     public Paint paintInsideStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -40,20 +41,30 @@ public abstract class Shapes extends Canvas{
         paintInsideStroke.setColor(Color.RED);
         paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
+        canAreaS = new Canvas();
         updateBitmap(btmp);
         resize();
     }
 
     public void drawShape(){
+        if(x < 0) x = 0 ;
+        else if(x +  width > btmpOrig.getWidth())
+            x = btmpOrig.getWidth() - width;
+
+        if(y < 0) y = 0;
+        else if(y + height >  btmpOrig.getHeight())
+            y = btmpOrig.getHeight() - height;
+
         drawBitmap(btmpShadown,0, 0,null);
         drawShapeFormat();
         drawBitmap(btmpAreaS,x,y,null);
     }
 
     public void resize(){
+        resizeFormat();
         rect = new Rect(0, 0, (int)width,(int)height);
         btmpAreaS = Bitmap.createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
-        canAreaS = new Canvas(btmpAreaS);
+        canAreaS.setBitmap(btmpAreaS);
     }
 
     public Bitmap createTemplateAreaS(){
