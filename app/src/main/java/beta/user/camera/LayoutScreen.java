@@ -72,7 +72,8 @@ public class LayoutScreen extends RelativeLayout {
         ((LinearLayout)findViewById(R.id.layoutImage)).addView(viewCamera);
         viewCamera.setOnTouchListener(touchEvent_Move);
         fbMenu.bringToFront();
-        dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26-37.png");
+        //dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26");
+        dir= new File("/storage/emulated/0/Download/imagem_teste.png");
 
         if(dir.exists()){
             setShape(0);

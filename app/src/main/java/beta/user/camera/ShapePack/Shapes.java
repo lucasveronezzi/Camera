@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -42,7 +43,7 @@ public abstract class Shapes extends Canvas{
         paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
         canAreaS = new Canvas();
-        updateBitmap(btmp);
+        updateBitmap(rotate(btmp, 90));
         resize();
     }
 
@@ -83,6 +84,26 @@ public abstract class Shapes extends Canvas{
         btmpShow = btmpShadown.copy(Bitmap.Config.ARGB_8888, true);
         setBitmap(btmpShow);
     }
+
+    private Bitmap rotate(Bitmap b, int degrees) {
+        if (degrees != 0 && b != null) {
+            Matrix m = new Matrix();
+
+            m.setRotate(degrees, (float) b.getWidth() / 2, (float) b.getHeight() / 2);
+            try {
+                Bitmap b2 = Bitmap.createBitmap(
+                        b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+                if (b != b2) {
+                    b.recycle();
+                    b = b2;
+                }
+            } catch (OutOfMemoryError ex) {
+                throw ex;
+            }
+        }
+        return b;
+    }
+
 
     public Bitmap getBtmpShow(){
         return btmpShow;
