@@ -78,7 +78,6 @@ public class LayoutScreen extends RelativeLayout {
         if(dir.exists()){
             setShape(0);
         }
-
     }
 
     public void hideFab(){
