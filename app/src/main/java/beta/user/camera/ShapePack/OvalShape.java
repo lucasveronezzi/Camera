@@ -9,8 +9,8 @@ import android.graphics.RectF;
 public class OvalShape extends Shapes {
     private final Paint paint1 = new Paint();
     private final Paint paint2 = new Paint();
-    public OvalShape(Bitmap btmp) {
-        super(btmp);
+    public OvalShape(ShapeDados dados) {
+        super(dados);
         paint1.setAntiAlias(true);
         paint2.setAntiAlias(true);
         paint2.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
@@ -30,7 +30,7 @@ public class OvalShape extends Shapes {
     }
 
     @Override
-    public void resizeFormat() {
+    public void resizeFormat(float x, float y) {
 
     }
 }

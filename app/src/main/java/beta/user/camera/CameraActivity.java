@@ -2,6 +2,8 @@ package beta.user.camera;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -14,14 +16,27 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
+import java.net.Socket;
+
+import beta.user.camera.ShapePack.ShapeDados;
+
 public class CameraActivity extends AppCompatActivity{
     public static boolean flag_contaGota = false;
     private LayoutScreen layoutScreen;
+    private SocketClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        client = (SocketClient) getIntent().getSerializableExtra("Socket");
         layoutScreen = new LayoutScreen(this);
+        File dir= new File("/storage/emulated/0/Download/imagem_teste.png");
+        int[] cor = {68,0,0,255};
+        ShapeDados dados = new ShapeDados(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true),
+                cor,200,200,150,150);
+        //layoutScreen.inicialize(client.dados);
+        layoutScreen.inicialize(dados);
         setContentView(layoutScreen);
 
        /* View mContentView = findViewById(R.id.layout_fullscreen);
@@ -74,7 +89,8 @@ public class CameraActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        layoutScreen.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
+        layoutScreen.backColorSeguranca = (GradientDrawable)getResources().getDrawable(R.drawable.button_border);
+        //layoutScreen.backColorSeguranca = (GradientDrawable)findViewById(R.id.corArea_view).getBackground();
     }
 
     public void createDialogEditTitle(){
@@ -108,7 +124,7 @@ public class CameraActivity extends AppCompatActivity{
                 .setSingleChoiceItems(R.array.ArrayFormatos,layoutScreen.idShape, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        layoutScreen.setShape(which);
+                        layoutScreen.setShape(which, null);
                         layoutScreen.idShape = which;
 
                     }
@@ -125,5 +141,7 @@ public class CameraActivity extends AppCompatActivity{
 
         builder.show();
     }
+
+
 
 }

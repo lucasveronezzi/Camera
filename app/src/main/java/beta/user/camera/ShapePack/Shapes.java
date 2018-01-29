@@ -16,14 +16,10 @@ import android.graphics.RectF;
  */
 
 public abstract class Shapes extends Canvas{
-    public float x = 200;
-    public float y = 200;
-    public float center;
-    public float width = 150;
-    public float height = 150;
+    public ShapeDados dados;
 
     public abstract void drawShapeFormat();
-    public abstract void resizeFormat();
+    public abstract void resizeFormat(float x, float y);
 
     public Rect rect;
     public Paint paintInsideStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -35,7 +31,9 @@ public abstract class Shapes extends Canvas{
 
     public Canvas canAreaS;
 
-    public Shapes(Bitmap btmp){
+    public Shapes(ShapeDados dados){
+        this.dados = dados;
+
         paintInsideStroke.setPathEffect(new DashPathEffect(new float[] {25,10}, 0));
         paintInsideStroke.setStrokeWidth(5f);
         paintInsideStroke.setStyle(Paint.Style.STROKE);
@@ -43,33 +41,31 @@ public abstract class Shapes extends Canvas{
         paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
         canAreaS = new Canvas();
-        updateBitmap(rotate(btmp, 90));
-        resize();
+        updateBitmap(rotate(dados.img, 90));
     }
 
     public void drawShape(){
-        if(x < 0) x = 0 ;
-        else if(x +  width > btmpOrig.getWidth())
-            x = btmpOrig.getWidth() - width;
+        if(dados.x < 0) dados.x = 0 ;
+        else if(dados.x +  dados.width > btmpOrig.getWidth())
+            dados.x = btmpOrig.getWidth() - dados.width;
 
-        if(y < 0) y = 0;
-        else if(y + height >  btmpOrig.getHeight())
-            y = btmpOrig.getHeight() - height;
+        if(dados.y < 0) dados.y = 0;
+        else if(dados.y + dados.height >  btmpOrig.getHeight())
+            dados.y = btmpOrig.getHeight() - dados.height;
 
         drawBitmap(btmpShadown,0, 0,null);
         drawShapeFormat();
-        drawBitmap(btmpAreaS,x,y,null);
+        drawBitmap(btmpAreaS,dados.x,dados.y,null);
     }
 
     public void resize(){
-        resizeFormat();
-        rect = new Rect(0, 0, (int)width,(int)height);
-        btmpAreaS = Bitmap.createBitmap((int)width, (int)height, Bitmap.Config.ARGB_8888);
+        rect = new Rect(0, 0, (int)dados.width,(int)dados.height);
+        btmpAreaS = Bitmap.createBitmap((int)dados.width, (int)dados.height, Bitmap.Config.ARGB_8888);
         canAreaS.setBitmap(btmpAreaS);
     }
 
     public Bitmap createTemplateAreaS(){
-        return Bitmap.createBitmap(btmpOrig,(int)x, (int)y,(int)width, (int)height);
+        return Bitmap.createBitmap(btmpOrig,(int)dados.x, (int)dados.y,(int)dados.width, (int)dados.height);
     }
 
     public void updateBitmap(Bitmap btmp){
@@ -104,11 +100,11 @@ public abstract class Shapes extends Canvas{
         return b;
     }
 
-
     public Bitmap getBtmpShow(){
         return btmpShow;
     }
     public Bitmap getBtmpOrig() {
         return btmpOrig;
     }
+
 }

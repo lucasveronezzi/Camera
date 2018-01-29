@@ -1,12 +1,8 @@
 package beta.user.camera;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -14,11 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity{
-    private TextView usuario;
-    private EditText senha;
-    private Context context;
-    private View include_form;
-    private View include_loading;
+    public TextView usuario;
+    public EditText senha;
+    private AppCompatActivity context;
+    public View include_form;
+    public View include_loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +28,6 @@ public class LoginActivity extends AppCompatActivity{
         include_loading = findViewById(R.id.include_loading);
         include_form.setVisibility(View.VISIBLE);
         include_loading.setVisibility(View.GONE);
-
     }
 
     @Override
@@ -44,8 +39,7 @@ public class LoginActivity extends AppCompatActivity{
 
     public void click_login(View v){
         if(validate()){
-            UserLoginTask task = new UserLoginTask(usuario.getText().toString(), senha.getText().toString());
-            task.execute();
+            new SocketClient().execute(this, SocketClient.NameTask.LOGIN);
         }
     }
 
@@ -61,37 +55,6 @@ public class LoginActivity extends AppCompatActivity{
         return true;
     }
 
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        private String s_usuario, s_senha;
-        UserLoginTask(String email, String password) {
-            s_usuario = email;
-            s_senha = password;
-        }
-        @Override
-        protected void onPreExecute() {
-            include_form.setVisibility(View.GONE);
-            include_loading.setVisibility(View.VISIBLE);
-        }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if(s_usuario.equals("admin") && s_senha.equals("admin")){
-                return true;
-            }
-            return false;
-        }
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if(success){
-                Intent intent = new Intent(context, CameraActivity.class);
-                startActivity(intent);
-                finish();
-            }else{
-                include_form.setVisibility(View.VISIBLE);
-                include_loading.setVisibility(View.GONE);
-                Toast.makeText(context,"Login Inválido",Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 }
 
