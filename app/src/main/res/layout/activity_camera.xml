@@ -34,11 +34,11 @@
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/formato"
+            android:id="@+id/brilho"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="click_showFormatos"
-            fab:fab_label="Formatos"
+            android:onClick="click_showBilrho"
+            fab:fab_label="Iluminação"
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton

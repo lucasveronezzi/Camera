@@ -14,10 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.io.File;
-import java.net.Socket;
 
 import beta.user.camera.ShapePack.ShapeDados;
 
@@ -29,7 +29,7 @@ public class CameraActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        client = (SocketClient) getIntent().getSerializableExtra("Socket");
+        //client = (SocketClient) getIntent().getSerializableExtra("Socket");
         layoutScreen = new LayoutScreen(this);
         File dir= new File("/storage/emulated/0/Download/imagem_teste.png");
         int[] cor = {68,0,0,255};
@@ -51,8 +51,8 @@ public class CameraActivity extends AppCompatActivity{
         getSupportActionBar().setTitle("Titulo");
     }
 
-    public void click_showFormatos(View v){
-        createDialogFormatos();
+    public void click_showBilrho(View v){
+        createDialogBrilho();
     }
     public void click_contaGota(View v){
         layoutScreen.hideFab();
@@ -117,7 +117,31 @@ public class CameraActivity extends AppCompatActivity{
         builder.show();
     }
 
-    public void createDialogFormatos(){
+    public void createDialogBrilho() {
+        final SeekBar seek = new SeekBar(this);
+        seek.setMax(255);
+        seek.setKeyProgressIncrement(1);
+        //seek.setProgress(client.brilho);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false)
+            .setIcon(android.R.drawable.btn_star_big_on)
+            .setTitle("Iluminação")
+            .setView(seek);
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //client.brilho = seek.getProgress();
+                layoutScreen.hideFab();
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    /*public void createDialogFormatos(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Formato da Área de Segurança")
@@ -130,7 +154,6 @@ public class CameraActivity extends AppCompatActivity{
                     }
                 });
 
-
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -140,8 +163,5 @@ public class CameraActivity extends AppCompatActivity{
         });
 
         builder.show();
-    }
-
-
-
+    }*/
 }

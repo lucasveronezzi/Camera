@@ -1,8 +1,6 @@
 package beta.user.camera;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
@@ -15,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.io.File;
@@ -70,7 +67,7 @@ public class LayoutScreen extends RelativeLayout {
         fbMenu.bringToFront();
         //dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26");
 
-        setShape(0, dados);
+        setShape(1, dados);
     }
 
     public void hideFab(){
@@ -90,15 +87,15 @@ public class LayoutScreen extends RelativeLayout {
         switch (id){
             case 0:
                 shape = new CircleShape(dados);
-                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_circle);
+                //((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_circle);
                 break;
             case 1:
                 shape = new RecShape(dados);
-                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_rect);
+                //((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_rect);
                 break;
             case 2:
                 shape = new OvalShape(dados);
-                ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_elipse);
+                //((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_elipse);
                 break;
         }
         shape.resize();

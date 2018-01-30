@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -27,6 +26,7 @@ public class SocketClient extends Socket {
     private SocketAddress sockaddr;
     private DialogError dg;
     private ProgressDialog pDialog;
+    public int brilho;
     public ShapeDados dados;
 
     public SocketClient() {
@@ -37,8 +37,10 @@ public class SocketClient extends Socket {
         switch (task){
             case LOGIN:
                 new UserLoginTask((LoginActivity)activity).execute();
+                break;
             case SEND_DADOS:
                 new SendDadosTask((CameraActivity) activity).execute();
+                break;
         }
     }
 
@@ -46,8 +48,9 @@ public class SocketClient extends Socket {
         return this;
     }
 
-    private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private class UserLoginTask extends AsyncTask<Void, Void, SocketClient.Status> {
         private LoginActivity activity;
+        private String error;
 
         UserLoginTask(LoginActivity loginActivity) {
             this.activity = loginActivity;
@@ -59,7 +62,7 @@ public class SocketClient extends Socket {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected SocketClient.Status doInBackground(Void... params) {
             try {
                 sockaddr = new InetSocketAddress(InetAddress.getByAddress(new byte[]{127, 0, 0, 1}), 57000);
                 getSocket().connect(sockaddr);
@@ -72,32 +75,41 @@ public class SocketClient extends Socket {
                     if (in.ready()) {
                         String result = in.readLine();
                         if(result == "ok")
-                            return true;
+                            return SocketClient.Status.SUCCESS;
                     }
                 }else{
 
                 }
             } catch (IOException e) {
-                dg = new DialogError(activity, "Falha ao seu conectar na placa.", e.getMessage());
-                dg.show();
+                error = e.getMessage();
                 e.printStackTrace();
+                return SocketClient.Status.SUCCESS;
             }
             /*if(s_usuario.equals("admin") && s_senha.equals("admin")){
                 return true;
             }*/
-            return false;
+            return SocketClient.Status.INVALID;
         }
         @Override
-        protected void onPostExecute(final Boolean success) {
-            if(success){
-                Intent intent = new Intent(activity, CameraActivity.class);
-                intent.putExtra("Socket", (Serializable) getSocket());
-                activity.startActivity(intent);
-                activity.finish();
-            }else{
-                activity.include_form.setVisibility(View.VISIBLE);
-                activity.include_loading.setVisibility(View.GONE);
-                Toast.makeText(activity,"Login Inválido",Toast.LENGTH_LONG).show();
+        protected void onPostExecute(final SocketClient.Status st) {
+            switch (st){
+                case SUCCESS:
+                    Intent intent = new Intent(activity, CameraActivity.class);
+                    //intent.putExtra("Socket", (Serializable) getSocket());
+                    activity.startActivity(intent);
+                    activity.finish();
+                    break;
+                case INVALID:
+                    activity.include_form.setVisibility(View.VISIBLE);
+                    activity.include_loading.setVisibility(View.GONE);
+                    Toast.makeText(activity,"Login Inválido",Toast.LENGTH_LONG).show();
+                    break;
+                case ERROR:
+                    activity.include_form.setVisibility(View.VISIBLE);
+                    activity.include_loading.setVisibility(View.GONE);
+                    dg = new DialogError(activity, "Falha ao seu conectar na placa.", error);
+                    dg.show();
+                    break;
             }
         }
     }
@@ -125,5 +137,11 @@ public class SocketClient extends Socket {
         LOGIN,
         SEND_DADOS,
         UPDATE_DADOS
+    }
+
+    public enum Status{
+        SUCCESS,
+        INVALID,
+        ERROR
     }
 }
