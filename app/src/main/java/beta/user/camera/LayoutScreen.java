@@ -23,13 +23,12 @@ import java.io.File;
 import beta.user.camera.ShapePack.CircleShape;
 import beta.user.camera.ShapePack.OvalShape;
 import beta.user.camera.ShapePack.RecShape;
+import beta.user.camera.ShapePack.ShapeDados;
 import beta.user.camera.ShapePack.Shapes;
 
 public class LayoutScreen extends RelativeLayout {
     private FloatingActionMenu fbMenu;
     private Rect fabRect;
-
-    private int[] cor_areaSegura = new int[4];
 
     private ImageView viewCamera;
 
@@ -39,10 +38,8 @@ public class LayoutScreen extends RelativeLayout {
 
     public int idShape = 0;
     private int move_mode = MOVE_NONE;
-    private float oldDist = 1f;
     private float oldX = 0;
     private float oldY = 0;
-    private float oldScale = 0;
     public GradientDrawable backColorSeguranca;
 
     private File dir;
@@ -62,10 +59,9 @@ public class LayoutScreen extends RelativeLayout {
         fbMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
         fabRect = new Rect();
         viewCamera = new ImageView(context);
-        inicialize();
     }
 
-    public void inicialize(){
+    public void inicialize(ShapeDados dados){
         viewCamera.setLayoutParams(
                 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         viewCamera.setAdjustViewBounds(true);
@@ -73,11 +69,8 @@ public class LayoutScreen extends RelativeLayout {
         viewCamera.setOnTouchListener(touchEvent_Move);
         fbMenu.bringToFront();
         //dir= new File("/storage/emulated/0/Pictures/Screenshots/Screenshot_2017-10-16-11-26");
-        dir= new File("/storage/emulated/0/Download/imagem_teste.png");
 
-        if(dir.exists()){
-            setShape(0);
-        }
+        setShape(0, dados);
     }
 
     public void hideFab(){
@@ -91,27 +84,25 @@ public class LayoutScreen extends RelativeLayout {
         viewCamera.setImageBitmap(shape.getBtmpShow());
     }
 
-    public void setShape(int id){
+    public void setShape(int id, ShapeDados dados){
+        if(dados == null)
+            dados = shape.dados;
         switch (id){
             case 0:
-                shape = new CircleShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
-                shape.drawShape();
+                shape = new CircleShape(dados);
                 ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_circle);
-                viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
             case 1:
-                shape = new RecShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
-                shape.drawShape();
+                shape = new RecShape(dados);
                 ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_rect);
-                viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
             case 2:
-                shape = new OvalShape(BitmapFactory.decodeFile(dir.getAbsolutePath()).copy(Bitmap.Config.ARGB_8888, true));
-                shape.drawShape();
+                shape = new OvalShape(dados);
                 ((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_elipse);
-                viewCamera.setImageBitmap(shape.getBtmpShow());
                 break;
         }
+        shape.resize();
+        updateImage();
     }
 
     public void setEventoContaGota(){
@@ -157,10 +148,10 @@ public class LayoutScreen extends RelativeLayout {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             int pixel = shape.getBtmpOrig().getPixel((int) event.getX(), (int) event.getY());
-            cor_areaSegura[0] = Color.alpha(pixel);
-            cor_areaSegura[1] = Color.red(pixel);
-            cor_areaSegura[2] = Color.green(pixel);
-            cor_areaSegura[3] = Color.blue(pixel);
+            shape.dados.cor[0] = Color.alpha(pixel);
+            shape.dados.cor[1] = Color.red(pixel);
+            shape.dados.cor[2] = Color.green(pixel);
+            shape.dados.cor[3] = Color.blue(pixel);
             backColorSeguranca.setColor(pixel);
             delEventContaGota();
             return false;
@@ -180,54 +171,33 @@ public class LayoutScreen extends RelativeLayout {
                     move_mode = MOVE_DRAG;
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN:
-                    oldDist = spacing(event);
-                    if (oldDist > 10f) {
+                    oldX  = Math.abs(event.getX(0) - event.getX(1));
+                    oldY = Math.abs(event.getY(0) - event.getY(1));
+                    if (oldX > 10f || oldY > 10f) {
                         move_mode = MOVE_RESIZE;
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if(move_mode == MOVE_DRAG){
-                        shape.x = shape.x + event.getX() - oldX;
-                        shape.y = shape.y + event.getY() - oldY;
+                        shape.dados.x = shape.dados.x + event.getX() - oldX;
+                        shape.dados.y = shape.dados.y + event.getY() - oldY;
 
                         Log.i("GetW",Float.toString(viewCamera.getWidth()));
                         Log.i("GetH",Float.toString(viewCamera.getHeight()));
-                        Log.i("GetX",Float.toString(shape.x));
-                        Log.i("GetY",Float.toString(shape.y));
+                        Log.i("GetX",Float.toString(shape.dados.x));
+                        Log.i("GetY",Float.toString(shape.dados.y));
                         oldX = event.getX();
                         oldY = event.getY();
                         updateImage();
                     }else if(move_mode == MOVE_RESIZE && event.getPointerCount() == 2){
-                        float newDist = spacing(event);
-                        if (newDist > 10f) {
-                            float scale = newDist - oldDist;
-                            float tot = scale - oldScale;
-                            if(tot > 10 || tot < -10){
-                                oldScale = scale;
-                                shape.width += tot;
-                                shape.height += tot;
-                                if(shape.width > shape.getBtmpOrig().getWidth()){
-                                    shape.width = shape.getBtmpOrig().getWidth();
-                                    break;
-                                }else if(shape.width < 10f) {
-                                    shape.width = 10f;
-                                    break;
-                                }
-                                if( shape.height > shape.getBtmpOrig().getHeight() ) {
-                                    shape.height = shape.getBtmpOrig().getHeight();
-                                    break;
-                                }else if(shape.height < 10f) {
-                                    shape.height = 10f;
-                                    break;
-                                }
-                                shape.resize();
+                                shape.resizeFormat(
+                                        Math.abs(event.getX(0) - event.getX(1)) - oldX,
+                                        Math.abs(event.getY(0) - event.getY(1)) - oldY);
 
-                                shape.x -= tot/2;
-                                shape.y -= tot/2;
+
+                                oldX = Math.abs(event.getX(0) - event.getX(1));
+                                oldY = Math.abs(event.getY(0) - event.getY(1));
                                 updateImage();
-                            }
-                            Log.i("scale",Float.toString(scale));
-                        }
                     }
                     break;
                 case MotionEvent.ACTION_UP: //first finger lifted

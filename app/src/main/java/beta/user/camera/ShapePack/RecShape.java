@@ -9,8 +9,8 @@ import android.graphics.Paint;
 
 public class RecShape extends Shapes {
     private final Paint pain1 = new Paint();
-    public RecShape(Bitmap btmp) {
-        super(btmp);
+    public RecShape(ShapeDados dados) {
+        super(dados);
         pain1.setAntiAlias(true);
     }
 
@@ -22,7 +22,7 @@ public class RecShape extends Shapes {
     }
 
     @Override
-    public void resizeFormat() {
+    public void resizeFormat(float x, float y) {
 
     }
 }
