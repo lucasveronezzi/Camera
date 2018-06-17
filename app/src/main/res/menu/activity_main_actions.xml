@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_alt"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Alterar Título"
+    <item
+        android:id="@+id/action_alt"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="Trocar Analise de Imagem"
         app:showAsAction="always" />
-    <item android:id="@+id/action_list"
-        android:title="Lista das Configurações"
-        app:showAsAction="never"/>
-    <item android:id="@+id/action_add"
-        android:title="Adicionar Configuração"
-        app:showAsAction="never"/>
-    <item android:id="@+id/action_del"
-        android:title="Excluir Configuração"
-        app:showAsAction="never"/>
-    <item android:id="@+id/action_salvar"
-        android:title="Trocar Usuário"
+    <item
+        android:id="@+id/action_config"
+        android:icon="@android:drawable/btn_dialog"
+        android:title="Configurar Imagem"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_analise"
+        android:title="Analisar Imagem"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_sair"
-        android:title="Sair do Aplicativo" />
+        android:id="@+id/action_prop"
+        android:title="Propriedades"
+        app:showAsAction="never"/>
 </menu>

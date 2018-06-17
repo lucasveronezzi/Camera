@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="30dp"
+    android:paddingRight="20dp"
+    android:paddingTop="5dp">
+
+    <TextView
+        android:id="@+id/textSizeMinimo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textSizeMaximo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:gravity="center" />
+
+    <RadioGroup
+        android:id="@+id/radioAreaSize"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <RadioButton
+            android:id="@+id/radioAreaManual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Manual" />
+
+        <LinearLayout
+            android:id="@+id/lnLargura"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Largura" />
+
+            <EditText
+                android:id="@+id/editAreaLargura"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:ems="10"
+                android:inputType="numberSigned|numberDecimal" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="45dp"
+                android:layout_height="wrap_content"
+                android:text=" cm" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lnComprimento"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Comprimento" />
+
+            <EditText
+                android:id="@+id/editAreaAltura"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:ems="10"
+                android:inputType="numberSigned|numberDecimal" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="45dp"
+                android:layout_height="wrap_content"
+                android:text=" cm" />
+
+
+        </LinearLayout>
+
+        <RadioButton
+            android:id="@+id/radioArea10x10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="Área 10x10 cm" />
+
+        <RadioButton
+            android:id="@+id/radioArea15x15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="Área 15x15 cm" />
+
+        <RadioButton
+            android:id="@+id/radioArea20x20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:text="Área 20x20 cm" />
+
+    </RadioGroup>
+
+</LinearLayout>

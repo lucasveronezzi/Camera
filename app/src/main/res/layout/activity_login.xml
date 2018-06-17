@@ -6,7 +6,7 @@
     android:background="@drawable/background_gradient"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="beta.user.camera.LoginActivity">
+    tools:context="com.cl3service.camera.LoginActivity">
 
     <!-- Login progress -->
 

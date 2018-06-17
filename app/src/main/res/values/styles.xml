@@ -1,12 +1,21 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="LoginTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorPrimaryLogin</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkLogin</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="ThemeMain" parent="Theme.AppCompat.Light">
+    <style name="MainTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorSecondary">@color/text_color</item>
+
         <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:numberPickerStyle" tools:targetApi="N">@android:style/Widget.Material.Light.NumberPicker</item>
     </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+    </style>
+
 </resources>

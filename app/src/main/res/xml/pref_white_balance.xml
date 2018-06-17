@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="@string/pref_key_balance_auto"
+        android:summary="@string/pref_descricao_auto_on"
+        android:title="@string/pref_title_auto" />
+
+    <ListPreference
+        android:entries="@array/arrayTemperature"
+        android:entryValues="@array/arrayTemperatureValue"
+        android:key="@string/pref_key_balance_value"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_temperature" />
+</PreferenceScreen>

@@ -5,17 +5,37 @@
     <string name="prompt_email">Usuário</string>
     <string name="prompt_password">Senha</string>
     <string name="action_sign_in">Acessar Dispositivo</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
 
     <string name="title_activity_camera">CameraActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_main22">Main22Activity</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="prop_name">Propriedades da Câmera</string>
+    <string name="pref_title_altura">Altura da Câmera</string>
+    <string name="pref_title_dialog_altura">Informe a Altura da Câmera</string>
+    <string name="pref_title_gain_expo">Ganho &amp; Exposição</string>
+    <string name="pref_title_white_balance">Balanço de Branco</string>
+
+    <string name="pref_title_category_gain">Ganho</string>
+    <string name="pref_title_category_expo">Exposição</string>
+    <string name="pref_title_gain">Valor do Ganho</string>
+    <string name="pref_title_expo">Tempo de Exposição</string>
+    <string name="pref_title_temperature">Tipo de Temperatura</string>
+    <string name="pref_title_balance_mode">Modo de Balanço de Branco</string>
+    <string name="pref_title_balance_auto">Balanço Automático</string>
+    <string name="pref_title_auto">Automático</string>
+
+    <string name="pref_descricao_auto_on">O valor é determinado pela câmera.</string>
+    <string name="pref_descricao_auto_off">O valor é determinado manualmente.</string>
+
+    <string name="pref_descricao_balance_auto_on">O tipo de temperatura é determinado pela câmera.</string>
+    <string name="pref_descricao_balance_auto_off">O tipo de temperatura é determinado manualmente.</string>
+
+    <string name="pref_key_altura">key_altura</string>
+    <string name="pref_key_gain_auto">gain_auto</string>
+    <string name="pref_key_gain_value">gain_value</string>
+    <string name="pref_key_expo_auto">expo_auto</string>
+    <string name="pref_key_expo_value">expo_value</string>
+    <string name="pref_key_balance_auto">balance_auto</string>
+    <string name="pref_key_balance_value">balance_value</string>
 </resources>

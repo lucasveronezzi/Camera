@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_title_category_gain">
+
+        <CheckBoxPreference
+            android:key="@string/pref_key_gain_auto"
+            android:summary="@string/pref_descricao_auto_on"
+            android:title="@string/pref_title_auto" />
+
+        <com.cl3service.camera.preferences.NumberPickerPreference
+            android:key="@string/pref_key_gain_value"
+            android:title="@string/pref_title_gain" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_title_category_expo">
+
+        <CheckBoxPreference
+            android:key="@string/pref_key_expo_auto"
+            android:summary="@string/pref_descricao_auto_on"
+            android:title="@string/pref_title_auto" />
+
+        <com.cl3service.camera.preferences.NumberPickerPreference
+            android:key="@string/pref_key_expo_value"
+            android:title="@string/pref_title_expo" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

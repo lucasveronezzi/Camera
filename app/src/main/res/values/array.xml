@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="ArrayFormatos">
-        <item>Circulo</item>
-        <item>Retângulo</item>
-        <item>Elipse</item>
+    <string-array name="arrayTemperature">
+        <item>Sodium-Vapor Lamp</item>
+        <item>Warm Light</item>
+        <item>Halogen Light</item>
+        <item>Neutral Light</item>
+        <item>Cool White Fluorescent Light</item>
+        <item>Cool White/Daylight</item>
+        <item>Daylight</item>
+        <item>Cool White LED</item>
+        <item>Blue Sky</item>
+    </string-array>
+    <string-array name="arrayTemperatureValue">
+        <item>2500</item>
+        <item>2700</item>
+        <item>3000</item>
+        <item>3500</item>
+        <item>4000</item>
+        <item>5000</item>
+        <item>6000</item>
+        <item>7500</item>
+        <item>10000</item>
     </string-array>
 </resources>
