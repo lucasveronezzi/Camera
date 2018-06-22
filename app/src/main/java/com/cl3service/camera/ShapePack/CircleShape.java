@@ -19,7 +19,7 @@ public class CircleShape extends Shapes {
         canAreaS.drawCircle(dados.width / 2, dados.height / 2,
                 dados.width / 2, paint1);
 
-        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, paint2);
+        //canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, paint2);
 
         canAreaS.drawCircle(dados.width / 2,dados.height/ 2,
                 dados.width / 2, paintInsideStroke);
@@ -27,7 +27,7 @@ public class CircleShape extends Shapes {
 
     @Override
     public void resizeFormat(float x,float y) {
-        float tot = x + y;
+        /*float tot = x + y;
         if (tot > 10 || tot < -10) {
             dados.width += tot;
             dados.height += tot;
@@ -44,8 +44,8 @@ public class CircleShape extends Shapes {
 
             dados.x -= tot/2;
             dados.y -= tot/2;
-        }
-        resize();
+        }*/
+        //resize();
     }
 
     @Override

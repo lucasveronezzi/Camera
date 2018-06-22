@@ -5,12 +5,10 @@ import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.widget.Button;
 import android.widget.Toast;
@@ -19,8 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -52,7 +48,8 @@ public class ServiceSocket extends Service {
     public ShapeDados dados;
     public String[] login = new String[2];
 
-    BitmapFactory.Options options;
+    private BitmapFactory.Options options;
+    private BitmapFactory.Options optionsMask;
 
     @Override
     public void onCreate() {
@@ -61,6 +58,13 @@ public class ServiceSocket extends Service {
             options.inDensity = DisplayMetrics.DENSITY_MEDIUM;
             options.inTargetDensity = getResources().getDisplayMetrics().densityDpi;
             options.inScaled = true;
+            options.inMutable = true;
+
+            optionsMask = new BitmapFactory.Options();
+            optionsMask.inDensity = DisplayMetrics.DENSITY_MEDIUM;
+            optionsMask.inTargetDensity = getResources().getDisplayMetrics().densityDpi;
+            optionsMask.inScaled = true;
+            optionsMask.inMutable = true;
 
             server = new ServerSocket(57000);
             listOfMethods = new ArrayList<DoMethodAfterExecute>();
@@ -94,20 +98,12 @@ public class ServiceSocket extends Service {
     }
 
     public boolean execute(NameTask task){
-        return execute(task, null, null);
+        return execute(task, null);
     }
 
-    public boolean execute(NameTask task, String arg){
-        return execute(task, arg, null);
-    }
-
-    public boolean execute(NameTask task, DoMethodAfterExecute... method){
-        return execute(task, null, method);
-    }
-
-    public boolean execute(NameTask task, String arg, DoMethodAfterExecute... methods){
+    public boolean execute(NameTask task, DoMethodAfterExecute... methods){
         if(client != null && !client_connected){
-            new ConnectClient(task, arg).execute();
+            new ConnectClient(task).execute();
             return true;
         }
 
@@ -123,10 +119,7 @@ public class ServiceSocket extends Service {
                 new GetAllDataTask().execute();
                 break;
             case GET_IMAGE:
-                new GetImageTask().execute(arg);
-                break;
-            case GET_IMAGE2:
-                new GetImageTask().execute(arg);
+                new GetImageTask().execute();
                 break;
             case UPDATE_DADOS:
                 new SaveDadosTask().execute();
@@ -146,15 +139,13 @@ public class ServiceSocket extends Service {
         private String error;
         private Button btn_send;
         private NameTask taskToDo;
-        private String arg;
 
         ConnectClient(){
             this.btn_send = (Button) activity.findViewById(R.id.login_send);;
         }
 
-        ConnectClient(NameTask task, String arg){
+        ConnectClient(NameTask task){
             taskToDo = task;
-            this.arg = arg;
         }
 
         @Override
@@ -170,7 +161,7 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... params) {
             try {
-                client = server.accept();
+                /*client = server.accept();
                 client.setKeepAlive(true);
 
                 entrada = new DataInputStream(client.getInputStream());
@@ -184,7 +175,8 @@ public class ServiceSocket extends Service {
                 byte[] ret = new byte[length];
                 entrada.readFully(ret, 0, ret.length);
 
-                login = new String(ret, "UTF-8").split(";");
+                login = new String(ret, "UTF-8").split(";");*/
+                login = new String[]{"admin", "admin"};
                 client_connected = true;
                 return ServiceSocket.Status.SUCCESS;
             }catch (Exception e) {
@@ -199,14 +191,14 @@ public class ServiceSocket extends Service {
             switch (st) {
                 case SUCCESS:
                     if(taskToDo != null){
-                        ServiceSocket.this.execute(taskToDo, arg);
+                        ServiceSocket.this.execute(taskToDo);
                     }else
                         btn_send.setEnabled(true);
                     break;
                 case ERROR:
                     btn_send.setEnabled(false);
                     dg = new DialogError(activity, "Falha ao conectar-se na placa.", error);
-                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this, null));
+                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this));
                     dg.show();
                     break;
             }
@@ -219,7 +211,7 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... voids) {
             try {
-                byte[] msg = "get_all".getBytes();
+                /*byte[] msg = "get_all".getBytes();
                 saida.writeInt(msg.length);
                 saida.write(msg);
                 //saida.flush();
@@ -232,51 +224,37 @@ public class ServiceSocket extends Service {
                 byte[] img = new byte[length];
                 entrada.readFully(img, 0, img.length);
 
-                String[] conf = new String(ret, "UTF-8").split("\\r?\\n");
-                String sCor = conf[6].split(":")[1];
-                int[] cor = {
-                        255,
-                        Integer.parseInt(sCor.split(",")[0]),
-                        Integer.parseInt(sCor.split(",")[1]),
-                        Integer.parseInt(sCor.split(",")[2])};
+                length = entrada.readInt();
+                byte[] img2 = new byte[length];
+                entrada.readFully(img2, 0, img2.length);
+
                 //BitmapFactory.decodeByteArray(img2, 0, img2.length, options)
                 //BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options);
                 dados = new ShapeDados(BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options),
-                        null,
+                        BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, optionsMask),
                         getResources().getDisplayMetrics().density,
-                        cor,
-                        Integer.parseInt(conf[3].split(":")[1]),
-                        Integer.parseInt(conf[2].split(":")[1]),
-                        Integer.parseInt(conf[5].split(":")[1]),
-                        Integer.parseInt(conf[4].split(":")[1]),
-                        Integer.parseInt(conf[1].split(":")[1]),
-                        Integer.parseInt(conf[0].split(":")[1]),
-                        Float.parseFloat(conf[8].split(":")[1]),
-                        Float.parseFloat(conf[9].split(":")[1]),
-                        Float.parseFloat(conf[10].split(":")[1]),
-                        Integer.parseInt(conf[11].split(":")[1])
-                );
+                        new String(ret, "UTF-8")
+                );*/
 
-               /* int[] cor = {
-                        255,
-                        50,
-                        50,
-                        50,
-                };*/
-
+                String str = "limit_width:300\n" +
+                        "limit_height:300\n" +
+                        "x:0\n" +
+                        "y:0\n" +
+                        "width:100\n" +
+                        "height:100\n" +
+                        "cor_rgb:152,55,12\n" +
+                        "cor_hsv:152,69,2\n" +
+                        "altura:40\n" +
+                        "gain:-1\n" +
+                        "expo:8233.4234\n" +
+                        "balance_temp:7500\n";
                 //BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options)
                 //BitmapFactory.decodeFile("/sdcard/image.bmp", options)
-               /* dados = new ShapeDados(BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options),
-                        null,
-                         getResources().getDisplayMetrics().density,
-                         cor,
-                        0,
-                        0,
-                        50,
-                        50,
-                        300,
-                        300,
-                        40);*/
+                dados = new ShapeDados(BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options),
+                        BitmapFactory.decodeResource(activity.getResources(), R.drawable.image_mask, optionsMask),
+                        getResources().getDisplayMetrics().density,
+                        str
+                        );
 
             } catch (Exception e) {
                 error = e.getMessage();
@@ -296,16 +274,15 @@ public class ServiceSocket extends Service {
                 case ERROR:
                     client_connected = false;
                     dg = new DialogError(activity, "Falha ao pegar as configurações da camera.", error );
-                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this, null));
+                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this));
                     dg.show();
                     break;
             }
         }
     }
 
-    private class GetImageTask extends AsyncTask<String, Void, ServiceSocket.Status> {
+    private class GetImageTask extends AsyncTask<Void, Void, ServiceSocket.Status> {
         private String error;
-        private String arg;
 
         @Override
         protected void onPreExecute() {
@@ -318,38 +295,29 @@ public class ServiceSocket extends Service {
         }
 
         @Override
-        protected ServiceSocket.Status doInBackground(String... arg) {
+        protected ServiceSocket.Status doInBackground(Void... voids) {
             try {
-                this.arg = arg[0];
-                String msg = "get_image_" + arg[0];
-
-                saida.writeInt(msg.getBytes().length);
-                saida.write(msg.getBytes());
+               /* byte[] msg =  "get_image".getBytes();
+                saida.writeInt(msg.length);
+                saida.write(msg);
                 //saida.flush();
 
                 int length = entrada.readInt();
                 byte[] img = new byte[length];
                 entrada.readFully(img, 0, img.length);
 
-                dados.setImgOri( BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options) );
+                length = entrada.readInt();
+                byte[] img2 = new byte[length];
+                entrada.readFully(img2, 0, img2.length);*/
 
-                if(arg[0].contains("analise")){
-                    length = entrada.readInt();
-                    byte[] img2 = new byte[length];
-                    entrada.readFully(img2, 0, img2.length);
+                options.inBitmap = dados.getImgOri();
+                dados.setImgOri( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options) );
+                //dados.setImgOri( BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options) );
 
-                    dados.setImgMask( BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, options) );
+                dados.setImgMask( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image_mask, optionsMask) );
+                //dados.setImgMask( BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, optionsMask) );
 
-                    /*if(dados.get_x_bk() + dados.width > dados.limit_width)
-                        dados.x = dados.limit_width - dados.width;
-                    else
-                        dados.x = dados.get_x_bk();
-
-                    dados.y = dados.get_y_bk() + dados.limit_height - 752;
-                    if(dados.y < 0) dados.y = 0;*/
-                    dados.x = 0;
-                    dados.y = 0;
-                }
+                ((CameraActivity) activity).layoutScreen.newImage();
 
             } catch (Exception e) {
                 error = e.getMessage();
@@ -366,13 +334,14 @@ public class ServiceSocket extends Service {
                     if(activity instanceof CameraActivity) {
                         dados.updateImg = false;
                         Toast.makeText(activity, "Imagem Atualizada", Toast.LENGTH_SHORT).show();
-                        ((CameraActivity) activity).updateImg();
+                        ((CameraActivity) activity).loadImg();
+                        doMethod();
                     }
                     break;
                 case ERROR:
                     client_connected = false;
                     dg = new DialogError(activity, "Falha ao atualizar a imagem da camera.", error);
-                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this, arg));
+                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this));
                     dg.show();
                     break;
             }
@@ -395,45 +364,35 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... voids) {
             try {
-                String sDados = "";
-                sDados += "limit_width:" + Integer.toString(  Math.round(dados.getOriginalPixel(dados.limit_height)) ) + "\n";
-                sDados += "limit_height:" + Integer.toString(  Math.round(dados.getOriginalPixel(dados.limit_width)) ) + "\n";
-                sDados += "x:" + Integer.toString(  Math.round(dados.getOriginalPixel(dados.y_bk)) ) + "\n";
-                sDados += "y:" + Integer.toString( Math.round(dados.getOriginalPixel((dados.img_width))) -  Math.round(dados.getOriginalPixel(dados.width_bk)) -  Math.round(dados.getOriginalPixel(dados.x_bk))  ) + "\n";
-                sDados += "width:" + Integer.toString( Math.round(dados.getOriginalPixel(dados.height_bk)) ) + "\n";
-                sDados += "height:" + Integer.toString( Math.round(dados.getOriginalPixel(dados.width_bk)) ) + "\n";
-                sDados += "cor_rgb:" +
-                        Integer.toString( dados.cor[1] ) + "," +
-                        Integer.toString( dados.cor[2] ) + "," +
-                        Integer.toString( dados.cor[3] ) + "\n";
-                if(CameraActivity.opt_config) {
-                    sDados += "cor_hsv:" + Integer.toString(Math.round(dados.getOriginalPixel(dados.cor_y))) + "," + Integer.toString(Math.round(dados.getOriginalPixel(dados.  img_width - dados.cor_x)) ) + "\n";
-                }else {
-                    sDados += "cor_hsv:" + Integer.toString(dados.cor_y)  + "," + Integer.toString( dados.cor_x )  + "\n";
-                }
-                sDados += "altura:" + Float.toString( dados.get_alturaCam() ) + ":\n";
-                sDados += "gain:"+ ( dados.gain_auto ? Integer.toString(-1): Float.toString(dados.gain) ) + "\n";
-                sDados += "expo:" + ( dados.exposure_auto ? Integer.toString(-1): Float.toString(dados.getExpo()) ) + "\n";
-                sDados += "balance_white_temp:"+ ( dados.balance_auto ? Integer.toString(-1): Integer.toString(dados.balance_temperature_value) )  + "\n";
+                String sDados = getStringConfig();
 
-                byte[] msg = "set_dados".getBytes();
-                saida.writeInt(msg.length);
-                saida.write(msg);
-                saida.flush();
+                if( dados.check_save_config(sDados) ) {
+                   /* byte[] msg = "set_dados".getBytes();
+                    saida.writeInt(msg.length);
+                    saida.write(msg);
+                    saida.flush();
 
-                byte[] bDados = sDados.getBytes();
-                saida.writeInt(bDados.length);
-                saida.write(bDados);
-                saida.flush();
+                    byte[] bDados = sDados.getBytes();
+                    saida.writeInt(bDados.length);
+                    saida.write(bDados);
+                    saida.flush();
 
-                int length = entrada.readInt();
-                byte[] ret = new byte[length];
-                entrada.readFully(ret, 0, ret.length);
+                    int length = entrada.readInt();
+                    byte[] ret = new byte[length];
+                    entrada.readFully(ret, 0, ret.length);
 
-                if( new String(ret, "UTF-8").compareTo("ok") == 0)
+                    if( new String(ret, "UTF-8").compareTo("ok") == 0){
+                        dados.setConfig(sDados);
+                        return ServiceSocket.Status.SUCCESS;
+                    }else
+                        return ServiceSocket.Status.INVALID;
+
+*/
+                    dados.setConfig(sDados);
                     return ServiceSocket.Status.SUCCESS;
+                }
 
-                return ServiceSocket.Status.SUCCESS;
+                return ServiceSocket.Status.NO_SAVE;
 
             } catch (Exception e) {
                 error = e.getMessage();
@@ -448,6 +407,8 @@ public class ServiceSocket extends Service {
             pDialog.dismiss();
             switch (st) {
                 case SUCCESS:
+                    dados.setCorHsvSave();
+                    dados.updateImg = true;
                     dados.saveDados = false;
                     Toast.makeText(activity,"Salvado com sucesso",Toast.LENGTH_SHORT).show();
                     doMethod();
@@ -465,10 +426,18 @@ public class ServiceSocket extends Service {
                     }*/
 
                     break;
+                case NO_SAVE:
+                    Toast.makeText(activity,"Não há alterações à serem salvas.",Toast.LENGTH_SHORT).show();
+                    doMethod();
+                    break;
+                case INVALID:
+                    Toast.makeText(activity,"Falha ao salvar as informações, tente novamente.",Toast.LENGTH_SHORT).show();
+                    listOfMethods.clear();
+                    break;
                 case ERROR:
                     client_connected = false;
-                    dg = new DialogError(activity, "Falha ao salvar as informações.", error);
-                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this, null));
+                    dg = new DialogError(activity, "Erro ao salvar as informações.", error);
+                    dg.builder.setPositiveButton("Fechar",new ReconectEvent(this));
                     dg.show();
                     break;
             }
@@ -477,10 +446,8 @@ public class ServiceSocket extends Service {
 
     public class ReconectEvent implements DialogInterface.OnClickListener {
         Object obj;
-        String arg;
-        ReconectEvent(AsyncTask obj, String arg){
+        ReconectEvent(AsyncTask obj){
             this.obj = obj;
-            this.arg = arg;
         }
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
@@ -489,23 +456,55 @@ public class ServiceSocket extends Service {
             else if(obj instanceof GetAllDataTask)
                 execute(NameTask.GET_ALL );
             else if(obj instanceof GetImageTask)
-                execute(NameTask.GET_IMAGE, arg);
+                execute(NameTask.GET_IMAGE);
             else if(obj instanceof SaveDadosTask)
                 execute(NameTask.UPDATE_DADOS );
         }
+    }
+
+    public String getStringConfig(){
+        int x = Math.round(dados.getOriginalPixel(dados.y));
+        int y = Math.round(dados.getOriginalPixel((dados.img_width))) -  Math.round(dados.getOriginalPixel(dados.width)) -  Math.round(dados.getOriginalPixel(dados.x));
+        int width = Math.round(dados.getOriginalPixel(dados.height));
+        int height = Math.round(dados.getOriginalPixel(dados.width));
+
+        if(x + width > 752) x = x - (x + width - 752);
+        if(y + height > 480) y = y - (y + height - 480);
+
+        String sDados = "";
+        sDados += "limit_width:" + Integer.toString(  Math.round(dados.getOriginalPixel(dados.limit_height)) ) + "\n";
+        sDados += "limit_height:" + Integer.toString(  Math.round(dados.getOriginalPixel(dados.limit_width)) ) + "\n";
+        sDados += "x:" + Integer.toString( x ) + "\n";
+        sDados += "y:" + Integer.toString( y ) + "\n";
+        sDados += "width:" + Integer.toString( width ) + "\n";
+        sDados += "height:" + Integer.toString( height ) + "\n";
+        sDados += "cor_rgb:" +
+                Integer.toString( dados.cor[1] ) + "," +
+                Integer.toString( dados.cor[2] ) + "," +
+                Integer.toString( dados.cor[3] ) + "\n";
+        if(dados.cor_x >= 0 && dados.cor_y >= 0 ) {
+            sDados += "cor_hsv:" + Integer.toString(Math.round(dados.getOriginalPixel(dados.cor_y))) + "," + Integer.toString(Math.round(dados.getOriginalPixel(dados.img_width - dados.cor_x)) ) + "\n";
+        }else {
+            sDados += "cor_hsv:-1,-1\n";
+        }
+        sDados += "altura:" + Float.toString( dados.get_alturaCam() ) + ":\n";
+        sDados += "gain:"+ ( dados.gain_auto ? Integer.toString(-1): Float.toString(dados.gain) ) + "\n";
+        sDados += "expo:" + ( dados.exposure_auto ? Integer.toString(-1): Float.toString(dados.getExpo()) ) + "\n";
+        sDados += "balance_white_temp:"+ ( dados.balance_auto ? Integer.toString(-1): Integer.toString(dados.balance_temperature_value) )  + "\n";
+        return sDados;
     }
 
     public enum NameTask{
         LOGIN,
         GET_ALL,
         GET_IMAGE,
-        GET_IMAGE2,
         UPDATE_DADOS
     }
 
     public enum Status{
         SUCCESS,
         INVALID,
+        NO_SAVE,
         ERROR
     }
 }

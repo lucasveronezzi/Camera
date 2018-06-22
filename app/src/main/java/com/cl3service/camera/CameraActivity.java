@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,9 +35,8 @@ import java.lang.reflect.Method;
 
 public class CameraActivity extends AppCompatActivity{
     public static boolean flag_contaGota = false;
-    private LayoutScreen layoutScreen;
+    public LayoutScreen layoutScreen;
     private ServiceCon con;
-    public static boolean opt_config = true;
     public ContextThemeWrapper ctw;
 
     @Override
@@ -44,10 +44,9 @@ public class CameraActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         try{
-        con = new ServiceCon(this);
-        bindService(new Intent(this, ServiceSocket.class), con, Context.BIND_AUTO_CREATE);
-        inicializaLayout();
-
+            con = new ServiceCon(this);
+            bindService(new Intent(this, ServiceSocket.class), con, Context.BIND_AUTO_CREATE);
+            inicializaLayout();
         }catch(Exception e){
             e.printStackTrace();
             writeToFile(e, this);
@@ -58,11 +57,7 @@ public class CameraActivity extends AppCompatActivity{
         ctw = new ContextThemeWrapper(this, R.style.DialogTheme);
         layoutScreen = new LayoutScreen(this);
         setContentView(layoutScreen);
-
-        if(opt_config)
-            change_to_config();
-        else
-            change_to_analise();
+        getSupportActionBar().setTitle("Configuração");
     }
 
     public void inicializaImagem(){
@@ -70,32 +65,34 @@ public class CameraActivity extends AppCompatActivity{
             if(con.service.dados != null){
                 if(layoutScreen != null){
                     layoutScreen.setShape(1, con.service.dados);
-                    if(con.service.dados.saveDados)
-                        saveAndUpdateImg();
-                    else if(con.service.dados.updateImg)
+                    if(con.service.dados.updateImg)
                         click_atualizarImg(null);
+                    else{
+                        layoutScreen.newImage();
+                        layoutScreen.setImgView();
+                    }
                 }
             }
-
         }catch(Exception e){
             writeToFile(e, this);
             e.printStackTrace();
         }
     }
 
-    public void updateImg(){
-        layoutScreen.newImage();
+    public void loadImg(){
+        layoutScreen.setImgView();
         Toast.makeText(this,"Imagem Atualizada",Toast.LENGTH_LONG).show();
     }
 
     public void click_atualizarImg(View v){
         layoutScreen.hideFab();
-        con.service.execute( ServiceSocket.NameTask.GET_IMAGE, CameraActivity.opt_config ? "config": "analise");
+        if(con.service.dados.saveDados)
+            saveAndUpdateImg();
+        else
+            con.service.execute( ServiceSocket.NameTask.GET_IMAGE);
     }
     public void click_salvar(View v){
         layoutScreen.hideFab();
-        if(opt_config)
-            con.service.dados.set_backup();
         con.service.execute( ServiceSocket.NameTask.UPDATE_DADOS);
     }
     public void click_contaGota(View v){
@@ -109,46 +106,12 @@ public class CameraActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_main_actions, menu);
-
-        MenuItem itemConfig = menu.findItem(R.id.action_config);
-        MenuItem itemAlt = menu.findItem(R.id.action_alt);
-        MenuItem itemAnalise = menu.findItem(R.id.action_analise);
-        MenuItem itemProp = menu.findItem(R.id.action_prop);
-        itemConfig.setVisible(!opt_config);
-        itemAlt.setVisible(!opt_config);
-        itemAnalise.setVisible(opt_config);
-        itemProp.setVisible(opt_config);
-
         return super.onCreateOptionsMenu(menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case R.id.action_alt:
-                if(con.service.dados.imgType == ShapeDados.TypeImg.ImgMask)
-                    con.service.dados.imgType = ShapeDados.TypeImg.ImgOrig;
-                else
-                    con.service.dados.imgType = ShapeDados.TypeImg.ImgMask;
-
-                layoutScreen.newImage();
-                break;
-            case R.id.action_analise:
-                layoutScreen.delEventos();
-                con.service.dados.set_backup();
-                con.service.dados.cor_x = -1;
-                con.service.dados.cor_y = -1;
-                change_to_analise();
-                saveAndUpdateImg();
-                break;
-            case R.id.action_config:
-                con.service.dados.imgType = ShapeDados.TypeImg.ImgOrig;
-                layoutScreen.setConfig();
-                con.service.dados.cor_x = -1;
-                con.service.dados.cor_y = -1;
-                change_to_config();
-                saveAndUpdateImg();
-                break;
             case R.id.action_prop:
                 Intent intent = new Intent(this, PropPreference.class);
                 startActivity(intent);
@@ -157,64 +120,57 @@ public class CameraActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    private void change_to_analise(){
-        opt_config = false;
-        getSupportActionBar().setTitle("Analisar Imagem");
-        enable_buttonFab(false);
-        invalidateOptionsMenu();
-    }
-
-    private void change_to_config(){
-        opt_config = true;
-        getSupportActionBar().setTitle("Configuração");
-        enable_buttonFab(true);
-        invalidateOptionsMenu();
-    }
-
     private void saveAndUpdateImg(){
         layoutScreen.hideFab();
         try {
-            Method method = con.service.getClass().getMethod("execute", ServiceSocket.NameTask.class, String.class);
+            Method method = con.service.getClass().getMethod("execute", ServiceSocket.NameTask.class);
             con.service.execute( ServiceSocket.NameTask.UPDATE_DADOS,
-                    new DoMethodAfterExecute(con.service, method, ServiceSocket.NameTask.GET_IMAGE, CameraActivity.opt_config ? "config": "analise") );
+                    new DoMethodAfterExecute(con.service, method, ServiceSocket.NameTask.GET_IMAGE) );
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
 
-    private void enable_buttonFab(boolean status){
-        FloatingActionButton fBut = (FloatingActionButton)findViewById(R.id.size_area);
-        FloatingActionButton fBut2 = (FloatingActionButton)findViewById(R.id.conta_gota);
-        FloatingActionButton fBut3 = (FloatingActionButton)findViewById(R.id.salvar);
-        if(status){
-            fBut.setVisibility(View.VISIBLE);
-            fBut.setEnabled(true);
-            fBut2.setVisibility(View.VISIBLE);
-            fBut2.setEnabled(true);
-            fBut3.setVisibility(View.VISIBLE);
-            fBut3.setEnabled(true);
-        }else{
-            fBut.setVisibility(View.GONE);
-            fBut.setEnabled(false);
-            fBut2.setVisibility(View.GONE);
-            fBut2.setEnabled(false);
-            fBut3.setVisibility(View.GONE);
-            fBut3.setEnabled(false);
+    public void click_testarImagem(View v){
+        layoutScreen.hideFab();
+        try {
+            if( con.service.dados.check_save_config( con.service.getStringConfig() ) ){
+                Method method = con.service.getClass().getMethod("execute", ServiceSocket.NameTask.class);
+                Method method2 = this.getClass().getMethod("createDialogTeste");
+                con.service.execute( ServiceSocket.NameTask.UPDATE_DADOS,
+                        new DoMethodAfterExecute(con.service, method, ServiceSocket.NameTask.GET_IMAGE),
+                        new DoMethodAfterExecute(this, method2));
+            }else{
+                if(con.service.dados.updateImg){
+                    Method method = this.getClass().getMethod("createDialogTeste");
+                    con.service.execute( ServiceSocket.NameTask.GET_IMAGE,
+                            new DoMethodAfterExecute(this, method));
+                }else{
+                    createDialogTeste();
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
     }
 
-    private void writeToFile(Exception data, Context context){
-        File path = new File("/storage/emulated/0/Download");
-        File file = new File(path, "logg.txt");
+    public void createDialogTeste(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctw);
 
-        try {
-            PrintStream ps = new PrintStream(file);
-            data.printStackTrace(ps);
-            ps.close();
-        } catch (IOException e) {
-            Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
+        final View view = getLayoutInflater().inflate( R.layout.dialog_teste_imagem, null);
+        final ImageView imageV = (ImageView) view.findViewById(R.id.image_teste_cor);
+        imageV.setImageBitmap(layoutScreen.getBitmapMask());
+        imageV.invalidate();
+
+        builder.setTitle("Reconhecimento da Luva")
+                .setView(view)
+                .setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create().show();
     }
 
     public void click_areaSize(View v){
@@ -350,6 +306,21 @@ public class CameraActivity extends AppCompatActivity{
 
         return R.id.radioAreaManual;
     }
+
+    private void writeToFile(Exception data, Context context){
+        File path = new File("/storage/emulated/0/Download");
+        File file = new File(path, "logg.txt");
+
+        try {
+            PrintStream ps = new PrintStream(file);
+            data.printStackTrace(ps);
+            ps.close();
+        } catch (IOException e) {
+            Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onResume() {

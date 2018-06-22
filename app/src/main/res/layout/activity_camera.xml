@@ -39,6 +39,14 @@
             fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/testar_imagem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="click_testarImagem"
+            fab:fab_label="Testar Reconhecimento da Luva"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/conta_gota"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

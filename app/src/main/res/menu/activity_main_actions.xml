@@ -3,19 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_alt"
-        android:icon="@android:drawable/ic_menu_rotate"
-        android:title="Trocar Analise de Imagem"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/action_config"
-        android:icon="@android:drawable/btn_dialog"
-        android:title="Configurar Imagem"
-        app:showAsAction="never" />
-    <item android:id="@+id/action_analise"
-        android:title="Analisar Imagem"
-        app:showAsAction="never"/>
-    <item
         android:id="@+id/action_prop"
         android:title="Propriedades"
         app:showAsAction="never"/>

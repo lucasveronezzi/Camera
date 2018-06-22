@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -30,11 +29,10 @@ public abstract class Shapes extends Canvas{
     public Paint paintInsideStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint paintText;
     private Paint paintRecInfo;
+    private Paint paintShadown;
 
     private Bitmap btmpShadown;
-    private Bitmap btmpOrig;
     private Bitmap btmpShow;
-    private Bitmap btmpAreaS;
 
     private float yRecTxt;
     private float xRecTxt;
@@ -69,22 +67,25 @@ public abstract class Shapes extends Canvas{
         paintInsideStroke.setColor(Color.RED);
         paintInsideStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
 
+        paintShadown = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintShadown.setAlpha(80);
+
         canAreaS = new Canvas();
-        updateBitmap();
     }
 
     public void drawShape(){
         if(dados.x < 0) dados.x = 0 ;
-        else if(dados.x + dados.width > btmpOrig.getWidth())
-            dados.x = btmpOrig.getWidth() - dados.width;
+        else if(dados.x + dados.width > dados.getImgOri().getWidth())
+            dados.x = dados.getImgOri().getWidth() - dados.width;
 
         if(dados.y < 0) dados.y = 0;
-        else if(dados.y + dados.height >  btmpOrig.getHeight())
-            dados.y = btmpOrig.getHeight() - dados.height;
+        else if(dados.y + dados.height >  dados.getImgOri().getHeight())
+            dados.y = dados.getImgOri().getHeight() - dados.height;
 
-        drawBitmap(btmpShadown,0, 0,null);
+        drawBitmap(dados.getImgOri(),0, 0,null);
+        drawBitmap(btmpShadown,0, 0,paintShadown);
         drawShapeFormat();
-        drawBitmap(btmpAreaS,dados.x,dados.y,null);
+        drawInfo();
     }
 
     public void drawInfo(){
@@ -103,14 +104,14 @@ public abstract class Shapes extends Canvas{
         xRightRect = xRecTxt + (20 * 2) + (widthTxtL > widthTxtC ? widthTxtL : widthTxtC);
         yBottomRect = dados.y + (fonte_sizePixel * 2) + (marginTextInfo * 5);
 
-        if(xRightRect > btmpOrig.getWidth()){
+        if(xRightRect > dados.getImgOri().getWidth()){
             xRecTxt = dados.x - 10 - (xRightRect - xRecTxt);
             xRightRect = xRecTxt + (20 * 2) + (widthTxtL > widthTxtC ? widthTxtL : widthTxtC);
         }
 
-        if(yBottomRect > btmpOrig.getHeight()){
-            yRecTxt =  btmpOrig.getHeight() - (yBottomRect - yRecTxt);
-            yBottomRect = btmpOrig.getHeight();
+        if(yBottomRect > dados.getImgOri().getHeight()){
+            yRecTxt =  dados.getImgOri().getHeight() - (yBottomRect - yRecTxt);
+            yBottomRect = dados.getImgOri().getHeight();
         }
 
         RectF rectInfo = new RectF(xRecTxt, yRecTxt, xRightRect, yBottomRect);
@@ -120,37 +121,33 @@ public abstract class Shapes extends Canvas{
         drawText(textC, xRecTxt + 20, yRecTxt + (fonte_sizePixel * 2) + (marginTextInfo * 2), paintText);
     }
 
-    public void resize(){
-        rect = new Rect(0, 0, (int)dados.width,(int)dados.height);
-        btmpAreaS = Bitmap.createBitmap((int)dados.width, (int)dados.height, Bitmap.Config.ARGB_8888);
-        canAreaS.setBitmap(btmpAreaS);
-    }
-
-    public Bitmap createTemplateAreaS(){
-        return Bitmap.createBitmap(btmpOrig,(int)dados.x, (int)dados.y,(int)dados.width, (int)dados.height);
-    }
-
     public void updateBitmap(){
-        btmpOrig = dados.getImg();
-        btmpShadown = btmpOrig.copy(Bitmap.Config.ARGB_8888, true);
-
-        if(CameraActivity.opt_config) {
-            Canvas canvas = new Canvas(btmpShadown);
-            RectF outerRectangle = new RectF(0, 0, btmpShadown.getWidth(), btmpShadown.getHeight());
-            Paint paintOuside = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paintOuside.setColor(Color.BLACK);
-            paintOuside.setAlpha(64);
-            canvas.drawRect(outerRectangle, paintOuside);
-        }
-
-        btmpShow = btmpShadown.copy(Bitmap.Config.ARGB_8888, true);
+        createShadownMask(dados.getImgOri().getWidth(), dados.getImgOri().getHeight());
+        btmpShow = dados.getImgOri().copy(Bitmap.Config.ARGB_8888, true);
         setBitmap(btmpShow);
+    }
+
+    public void createShadownMask(int width, int height){
+        btmpShadown = Bitmap.createBitmap( width, height, Bitmap.Config.ALPHA_8);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.BLACK);
+        Canvas canvas = new Canvas(btmpShadown);
+        canvas.drawRect(0, 0, width, height, paint);
+    }
+
+    public Bitmap getBtmpMask(int width, int height){
+        Bitmap btmp = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.BLACK);
+
+        Canvas canvas = new Canvas(btmp);
+        canvas.drawRect(0, 0, width, height, paint);
+        canvas.drawBitmap(dados.getImgMask(), dados.x, dados.y, null);
+        canvas.drawRect(dados.x, dados.y, dados.x + dados.width, dados.y + dados.height, paintInsideStroke);
+        return btmp;
     }
 
     public Bitmap getBtmpShow(){
         return btmpShow;
-    }
-    public Bitmap getBtmpOrig() {
-        return btmpOrig;
     }
 }

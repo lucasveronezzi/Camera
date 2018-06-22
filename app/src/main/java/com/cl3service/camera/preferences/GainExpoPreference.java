@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import com.cl3service.camera.R;
 
 public class GainExpoPreference extends AbstractPreferenceActivity  {
+    public static float expo_max;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +24,8 @@ public class GainExpoPreference extends AbstractPreferenceActivity  {
     }
 
     public void inicializarDados(){
+        expo_max = con.service.dados.getExpoMaxMS();
+
         editorPref.putBoolean(key_gain_auto, con.service.dados.gain_auto );
         editorPref.putFloat(key_gain_value, con.service.dados.gain );
         editorPref.putBoolean(key_expo_auto, con.service.dados.exposure_auto );

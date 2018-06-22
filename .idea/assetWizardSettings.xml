@@ -107,7 +107,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_arrow_drop_up_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_featured_video_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -117,12 +117,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="a69ea6" />
-                            <entry key="height" value="60" />
-                            <entry key="outputName" value="ic_arrow_drop_up_black_24dp" />
+                            <entry key="outputName" value="ic_testar_imagem_black_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="C:\Users\Lucas" />
-                            <entry key="width" value="60" />
                           </map>
                         </option>
                       </PersistentState>

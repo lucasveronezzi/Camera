@@ -7,7 +7,6 @@ import android.os.IBinder;
 
 import com.cl3service.camera.CameraActivity;
 import com.cl3service.camera.LoginActivity;
-import com.cl3service.camera.preferences.AbstractPreferenceActivity;
 import com.cl3service.camera.preferences.GainExpoPreference;
 import com.cl3service.camera.preferences.PropPreference;
 import com.cl3service.camera.preferences.WhiteBalancePreference;
@@ -18,7 +17,7 @@ import com.cl3service.camera.preferences.WhiteBalancePreference;
 
 public class ServiceCon implements ServiceConnection {
     public ServiceSocket service;
-    public boolean mBound = false;
+    private boolean mBound = false;
     private Activity activity;
 
     public ServiceCon( Activity activity){
@@ -33,7 +32,7 @@ public class ServiceCon implements ServiceConnection {
         mBound = true;
 
         if(activity instanceof LoginActivity)
-            this.service.execute(ServiceSocket.NameTask.LOGIN );
+            ((LoginActivity)this.activity).check_usb_debuggin();
 
         if(activity instanceof CameraActivity)
             ((CameraActivity)this.activity).inicializaImagem();

@@ -1,6 +1,8 @@
 package com.cl3service.camera.ShapePack;
 
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.util.Log;
 
 /**
  * Created by User on 25/10/2017.
@@ -15,9 +17,9 @@ public class RecShape extends Shapes {
 
     @Override
     public void drawShapeFormat() {
-        canAreaS.drawARGB(0, 0, 0, 0);
-        canAreaS.drawBitmap(createTemplateAreaS(), rect, rect, pain1);
-        canAreaS.drawRect(rect,paintInsideStroke);
+        rect = new Rect( (int)dados.x, (int)dados.y, (int) (dados.x + dados.width),(int) (dados.y + dados.height) );
+        drawBitmap( dados.getImgOri(), rect, rect, pain1);
+        drawRect(dados.x, dados.y, dados.x + dados.width, dados.y + dados.height, paintInsideStroke);
     }
 
     @Override
@@ -39,14 +41,11 @@ public class RecShape extends Shapes {
             }
             dados.y -= y/2;
             if(dados.y < 0) dados.y = 0;
-
-        resize();
     }
 
     @Override
     public void resizeFormatAtCm(float widthCm, float heightCm) {
         dados.width =  dados.convertToPixel(widthCm);
         dados.height = dados.convertToPixel(heightCm);
-        resize();
     }
 }

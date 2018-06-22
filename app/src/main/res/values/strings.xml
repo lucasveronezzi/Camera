@@ -38,4 +38,15 @@
     <string name="pref_key_expo_value">expo_value</string>
     <string name="pref_key_balance_auto">balance_auto</string>
     <string name="pref_key_balance_value">balance_value</string>
+
+    <string name="text_usb_debug">É necessário hábilitar a opção <b>USB DEBUGGING</b>
+        acessando:\n\n <b>Configurações > Opções de Desenvolvedor</b>\n\nSe por caso o menu <b>Opções de
+            Desenvolvedor</b> não estiver aparencedo na tela de <b>Configurações</b>,
+        acesse:\n\n<b>Configurações
+            > Sobre o Telefone > Informações sobre o Software</b> e toque em <b>Número de
+            Montagem 7</b>
+        vezes.\n\nAo retornar para a tela de Configurações você irá encontrar o menu <b>Opções
+            de Desenvolvedor.</b>\n\nApós hábilitar opção <b>USB Debugging</b> clique em <b>OK
+        </b>
+    </string>
 </resources>

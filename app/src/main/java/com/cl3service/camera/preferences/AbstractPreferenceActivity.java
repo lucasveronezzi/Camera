@@ -116,23 +116,23 @@ public abstract class AbstractPreferenceActivity extends AppCompatActivity{
     private Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-            con.service.dados.saveDados = firstChange ? con.service.dados.saveDados : true;
-            con.service.dados.updateImg = firstChange ? con.service.dados.updateImg : true;
-
             String stringValue = value.toString();
             String key = preference.getKey();
             Float floatValue;
             ListPreference listPreference;
+
+            con.service.dados.saveDados = firstChange ? con.service.dados.saveDados : true;
+            con.service.dados.updateImg = firstChange ? con.service.dados.updateImg : true;
 
             switch (key){
                 case "key_altura":
                     floatValue = Float.parseFloat(stringValue);
                     if(floatValue > 50){
                         floatValue = 50f;
-                        Toast.makeText(AbstractPreferenceActivity.this,"Altura máxima é de: 80 cm",Toast.LENGTH_LONG).show();
+                        Toast.makeText(AbstractPreferenceActivity.this,"Altura máxima é de: 50 cm",Toast.LENGTH_LONG).show();
                     }else if(floatValue < 30){
                         floatValue = 30f;
-                        Toast.makeText(AbstractPreferenceActivity.this,"Altura mínima é de: 10 cm",Toast.LENGTH_LONG).show();
+                        Toast.makeText(AbstractPreferenceActivity.this,"Altura mínima é de: 30 cm",Toast.LENGTH_LONG).show();
                     }
                     con.service.dados.set_alturaCam( floatValue );
                     preference.setSummary("Distância de " + floatValue + " cm da mesa.");

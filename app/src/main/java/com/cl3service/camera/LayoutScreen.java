@@ -2,12 +2,8 @@ package com.cl3service.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Rect;
-import android.support.v7.app.AppCompatDelegate;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -23,7 +18,6 @@ import com.github.clans.fab.FloatingActionMenu;
 import java.io.File;
 
 import com.cl3service.camera.ShapePack.CircleShape;
-import com.cl3service.camera.ShapePack.OvalShape;
 import com.cl3service.camera.ShapePack.RecShape;
 import com.cl3service.camera.ShapePack.ShapeDados;
 import com.cl3service.camera.ShapePack.Shapes;
@@ -43,7 +37,6 @@ public class LayoutScreen extends RelativeLayout {
     private float oldX = 0;
     private float oldY = 0;
     public RelativeLayout backColorSeguranca;
-    private Context context;
 
     private double scaleX;
     private double scaleY;
@@ -58,7 +51,6 @@ public class LayoutScreen extends RelativeLayout {
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(lp);
-        this.context = context;
 
         LayoutInflater inflater = LayoutInflater.from(context);
         View inflatedLayout= inflater.inflate(R.layout.activity_camera, null, false);
@@ -66,10 +58,12 @@ public class LayoutScreen extends RelativeLayout {
 
         backColorSeguranca = (RelativeLayout)findViewById(R.id.corArea_view);
         fbMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
+        ( (FloatingActionButton)findViewById(R.id.size_area) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_photo_size_select_large_black_24dp));
         ( (FloatingActionButton)findViewById(R.id.conta_gota) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_conta_gota));
+        ( (FloatingActionButton)findViewById(R.id.testar_imagem) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_testar_imagem_black_24dp));
         ( (FloatingActionButton)findViewById(R.id.atualizar) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_linked_camera_black_24dp));
         ( (FloatingActionButton)findViewById(R.id.salvar) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
-        ( (FloatingActionButton)findViewById(R.id.size_area) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_photo_size_select_large_black_24dp));
+
 
         fabRect = new Rect();
         viewCamera = new ImageView(context);
@@ -93,8 +87,10 @@ public class LayoutScreen extends RelativeLayout {
 
     private void updateImage(){
         shape.drawShape();
-        if(CameraActivity.opt_config)
-            shape.drawInfo();
+        setImgView();
+    }
+
+    public void setImgView(){
         viewCamera.setImageBitmap(shape.getBtmpShow());
         viewCamera.invalidate();
     }
@@ -102,7 +98,7 @@ public class LayoutScreen extends RelativeLayout {
     public void newImage(){
         firstImage = true;
         shape.updateBitmap();
-        updateImage();
+        shape.drawShape();
     }
 
     public void setAreaAtCm(float widthCm, float heightCm){
@@ -120,14 +116,8 @@ public class LayoutScreen extends RelativeLayout {
                 shape = new RecShape(dados);
                 //((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_rect);
                 break;
-            case 2:
-                //shape = new OvalShape(shape.dados);
-                //((FloatingActionButton)findViewById(R.id.formato)).setImageResource(R.mipmap.ic_elipse);
-                break;
         }
-        shape.dados = dados;
         updateColorSeg(shape.dados.cor);
-        shape.resize();
         delEventContaGota();
     }
 
@@ -135,23 +125,17 @@ public class LayoutScreen extends RelativeLayout {
         return shape.dados;
     }
 
+    public Bitmap getBitmapMask(){
+        return shape.getBtmpMask(shape.dados.getImgOri().getWidth(), shape.dados.getImgOri().getHeight());
+    }
+
     public void setEventoContaGota(){
-        viewCamera.setImageBitmap(shape.getBtmpOrig());
+        viewCamera.setImageBitmap( shape.dados.getImgOri() );
         viewCamera.setOnTouchListener(null);
         viewCamera.setOnTouchListener(touchEvent_contaGota);
     }
     public void delEventContaGota(){
         viewCamera.setOnTouchListener(null);
-        if(CameraActivity.opt_config)
-            viewCamera.setOnTouchListener(touchEvent_Move);
-        updateImage();
-    }
-
-    public void delEventos(){
-        viewCamera.setOnTouchListener(null);
-    }
-    public void setConfig(){
-        shape.dados.return_backup();
         viewCamera.setOnTouchListener(touchEvent_Move);
     }
 
@@ -169,13 +153,10 @@ public class LayoutScreen extends RelativeLayout {
                         viewCamera.getGlobalVisibleRect(viewRect);
                         if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
                             delEventContaGota();
+                            updateImage();
                             CameraActivity.flag_contaGota = false;
                         }
                     }
-                fbMenu.getGlobalVisibleRect(fabRect);
-                if (fabRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-
-                }
                 break;
 
         }
@@ -183,8 +164,8 @@ public class LayoutScreen extends RelativeLayout {
     }
 
     public void setScaleImage(){
-        scaleX = (double)shape.getBtmpOrig().getWidth() / (double)viewCamera.getWidth();
-        scaleY = (double)shape.getBtmpOrig().getHeight() / (double)viewCamera.getHeight();
+        scaleX = (double)shape.dados.getImgOri().getWidth() / (double)viewCamera.getWidth();
+        scaleY = (double)shape.dados.getImgOri().getHeight() / (double)viewCamera.getHeight();
         firstImage = false;
     }
 
@@ -193,6 +174,7 @@ public class LayoutScreen extends RelativeLayout {
         public boolean onTouch(View v, MotionEvent event) {
             if(firstImage) setScaleImage();
 
+            shape.dados.saveDados = true;
             shape.dados.cor_x = (int)((double)event.getX() * scaleX);
             shape.dados.cor_y = (int)((double)event.getY() * scaleY);
 
@@ -203,13 +185,14 @@ public class LayoutScreen extends RelativeLayout {
             int x = Integer.valueOf((int)eventXY[0]);
             int y = Integer.valueOf((int)eventXY[1]);*/
 
-            int pixel = shape.getBtmpOrig().getPixel(shape.dados.cor_x, shape.dados.cor_y);
+            int pixel = shape.dados.getImgOri().getPixel(shape.dados.cor_x, shape.dados.cor_y);
             shape.dados.cor[0] = Color.alpha(pixel);
             shape.dados.cor[1] = Color.red(pixel);
             shape.dados.cor[2] = Color.green(pixel);
             shape.dados.cor[3] = Color.blue(pixel);
             updateColorSeg(shape.dados.cor);
             delEventContaGota();
+            updateImage();
             return false;
         }
     };

@@ -27,13 +27,9 @@ public class ShapeDados {
 
     public boolean gain_auto = true;
     public float gain;
-    public float gainMin = 0;
-    public float gainMax = 11.75f;
 
     public boolean exposure_auto = false;
     private float exposure;
-    public float exposureMin = 1000f;
-    public float exposureMax = 9000f;
 
     public boolean balance_auto = true;
     public int balance_temperature_value = 4000;
@@ -46,72 +42,75 @@ public class ShapeDados {
     public int img_width = 480;
     public int img_height = 752;
 
-    public float x_bk;
-    public float y_bk;
-    public float width_bk;
-    public float height_bk;
-
     private Bitmap imgOri;
     private Bitmap imgMask;
 
-    public int[] cor = new int[4];
+    public int[] cor;
     public int cor_x = -1;
     public int cor_y = -1;
 
-    public TypeImg imgType;
+    private String config;
 
-    public ShapeDados(Bitmap imgOri, Bitmap imgMask, float density, int[] cor, int x, int y, int width, int height, int limit_width, int limit_height, float altura, float gain, float exposure, int balance_temperature_value){
+    public ShapeDados(Bitmap imgOri, Bitmap imgMask, float density, String config){
         if(imgOri == null) createImage();
         else{
             setImgOri(imgOri);
-            if(imgMask != null)
-                setImgMask(imgMask);
+            setImgMask(imgMask);
         }
-
         this.density = BigDecimal.valueOf(density);
 
-        this.cor = cor;
-        this.x = getScaledPixel(img_width - width - x);
-        this.y = getScaledPixel(y);
-        this.width = getScaledPixel(width);
-        this.height = getScaledPixel(height);
+        String[] conf = config.split("\\r?\\n");
 
-        this.limit_width = getScaledPixel(limit_width);
-        this.limit_height = getScaledPixel(limit_height);
+        String sCor = conf[6].split(":")[1];
+        this.cor = new int[]{
+                255,
+                Integer.parseInt(sCor.split(",")[0]),
+                Integer.parseInt(sCor.split(",")[1]),
+                Integer.parseInt(sCor.split(",")[2])};
 
-        img_width = Math.round(getScaledPixel(img_width));
-        img_height = Math.round(getScaledPixel(img_height));
+        limit_width = getScaledPixel( Integer.parseInt(conf[1].split(":")[1]) );
+        limit_height = getScaledPixel( Integer.parseInt(conf[0].split(":")[1]) );
 
+        int width_pre = Integer.parseInt(conf[5].split(":")[1]);
+        x = getScaledPixel(img_width - width_pre - Integer.parseInt(conf[3].split(":")[1]) );
+        y = getScaledPixel( Integer.parseInt(conf[2].split(":")[1]) );
+
+        width = getScaledPixel(width_pre);
+        height = getScaledPixel( Integer.parseInt(conf[4].split(":")[1]) );
+
+        balance_temperature_value = Integer.parseInt(conf[11].split(":")[1]);
         if(balance_temperature_value >= 0){
             balance_auto = false;
-            this.balance_temperature_value = balance_temperature_value;
         }
         else{
             balance_auto = true;
             this.balance_temperature_value = 2500;
         }
 
+        gain = Float.parseFloat(conf[9].split(":")[1]);
         if(gain >= 0){
             gain_auto = false;
-            this.gain = gain;
         }
         else{
             gain_auto = true;
-            this.gain = gainMin;
+            gain = 0;
         }
 
+        exposure = Float.parseFloat(conf[10].split(":")[1]);
         if(exposure >= 0){
             exposure_auto = false;
-            this.exposure = exposure;
         }
         else{
             exposure_auto = true;
-            this.exposure = exposureMin;
+            exposure = 100f;
         }
 
-        set_alturaCam (altura);
+        img_width = Math.round(getScaledPixel(img_width));
+        img_height = Math.round(getScaledPixel(img_height));
 
-        imgType = TypeImg.ImgOrig;
+        set_alturaCam ( Float.parseFloat(conf[8].split(":")[1]) );
+
+        setConfig(config);
     }
 
     private void createImage(){
@@ -120,20 +119,6 @@ public class ShapeDados {
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         canvas.drawRect(0F, 0F, (float) width, (float) height, paint);
-    }
-
-    public Bitmap getImg(){
-        if(imgType == TypeImg.ImgOrig)
-            return imgOri;
-        else
-            return imgMask;
-    }
-
-    public void setImgMask(Bitmap img){
-        this.imgMask = rotate(img, 90);
-    }
-    public void setImgOri(Bitmap img){
-        this.imgOri = rotate(img, 90);
     }
 
     private Bitmap rotate(Bitmap b, int degrees) {
@@ -155,18 +140,20 @@ public class ShapeDados {
         return b;
     }
 
-    public void set_backup(){
-        x_bk = x;
-        y_bk = y;
-        width_bk = width;
-        height_bk = height;
+    public void setImgMask(Bitmap img){
+        imgMask = rotate(img, 90);
     }
 
-    public void return_backup(){
-        x = x_bk;
-        y = y_bk;
-        width = width_bk;
-        height = height_bk;
+    public void setImgOri(Bitmap img){
+        imgOri = rotate(img, 90);
+    }
+
+    public Bitmap getImgMask(){
+        return imgMask;
+    }
+
+    public Bitmap getImgOri(){
+        return imgOri;
     }
 
     public void set_alturaCam(float value){
@@ -177,12 +164,10 @@ public class ShapeDados {
         min_height = convertToPixel(5f);
 
         if(min_width > width){
-            width_bk = min_width;
             width = min_width;
         }
         if(min_height > height){
             height = min_height;
-            height_bk = min_height;
         }
     }
 
@@ -206,8 +191,25 @@ public class ShapeDados {
         return bdValue.divide(density, MathContext.DECIMAL32).floatValue();
     }
 
+    public float getExpoMaxMS(){
+        double fps = getFpsMax() * 0.85d;
+        return (float) (1000 / fps);
+    }
+
+    public double getFpsMax(){
+        float fwidth = getOriginalPixel(height);
+        float fheight = getOriginalPixel(width);
+        fwidth = fwidth < 96 ? 96 : fwidth;
+        fheight = fheight < 64 ? 64 : fheight;
+        double MHB = 61, MTW = 701, VB = 45;
+        double HB = (MHB > (MTW-fwidth)) ? (MHB) : (MTW-fwidth);
+        double TP = (HB + fwidth) * (VB + fheight);
+        return 42682500d / TP;
+    }
     public float getExpoMs(){
-        return exposure / 1000;
+        float value = exposure / 1000;
+        float maxValue = getExpoMaxMS() - 1;
+        return value > maxValue ? maxValue : value;
     }
     public float getExpo(){
         return exposure;
@@ -220,16 +222,17 @@ public class ShapeDados {
         return alturaCam;
     }
 
-    public float get_x_bk(){
-        return x_bk;
+    public void setCorHsvSave(){
+        cor_x = -1;
+        cor_y = -1;
     }
-    public float get_y_bk(){
-        return y_bk;
-    }
-
-    public enum TypeImg{
-        ImgOrig,
-        ImgMask
+    public boolean check_save_config(String str){
+        return !config.contentEquals(str);
     }
 
+    public void setConfig(String str){
+        String[] conf = str.split("\\r?\\n");
+        String hsv = conf[7];
+        config = str.replace(hsv, "cor_hsv:-1,-1");
+    }
 }
