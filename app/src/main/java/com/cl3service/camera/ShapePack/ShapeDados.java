@@ -44,6 +44,7 @@ public class ShapeDados {
 
     private Bitmap imgOri;
     private Bitmap imgMask;
+    private Bitmap imgMask2;
 
     public int[] cor;
     public int cor_x = -1;
@@ -51,11 +52,12 @@ public class ShapeDados {
 
     private String config;
 
-    public ShapeDados(Bitmap imgOri, Bitmap imgMask, float density, String config){
+    public ShapeDados(Bitmap imgOri, Bitmap imgMask, Bitmap imsMask2, float density, String config){
         if(imgOri == null) createImage();
         else{
             setImgOri(imgOri);
             setImgMask(imgMask);
+            setImgMask2(imgMask2);
         }
         this.density = BigDecimal.valueOf(density);
 
@@ -140,12 +142,20 @@ public class ShapeDados {
         return b;
     }
 
+    public void setImgMask2(Bitmap img){
+        imgMask2 = rotate(img, 90);
+    }
+
     public void setImgMask(Bitmap img){
         imgMask = rotate(img, 90);
     }
 
     public void setImgOri(Bitmap img){
         imgOri = rotate(img, 90);
+    }
+
+    public Bitmap getImgMask2(){
+        return imgMask;
     }
 
     public Bitmap getImgMask(){
@@ -208,7 +218,7 @@ public class ShapeDados {
     }
     public float getExpoMs(){
         float value = exposure / 1000;
-        float maxValue = getExpoMaxMS() - 1;
+        float maxValue = getExpoMaxMS();
         return value > maxValue ? maxValue : value;
     }
     public float getExpo(){

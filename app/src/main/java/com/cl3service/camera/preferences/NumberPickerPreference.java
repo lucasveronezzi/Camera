@@ -66,7 +66,7 @@ public class NumberPickerPreference extends DialogPreference {
             textUnit.setText("db");
         }else
         if( getKey().contentEquals( "expo_value" )){
-            int maxValue = (int) ((GainExpoPreference.expo_max) - 1);
+            int maxValue = (int) ((GainExpoPreference.expo_max));
             nbInt.setMinValue(0);
             nbInt.setMaxValue(maxValue);
             textUnit.setText("ms");

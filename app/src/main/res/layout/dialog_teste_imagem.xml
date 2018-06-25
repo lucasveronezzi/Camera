@@ -3,15 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="10dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
-    android:paddingTop="20dp">
+    android:paddingTop="10dp">
+
+    <Switch
+        android:id="@+id/switch_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:checked="true"
+        android:textOff="Img"
+        android:textOn="Mask"
+       />
 
     <ImageView
         android:id="@+id/image_teste_cor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        app:srcCompat="@android:color/background_light" />
+        android:layout_below="@id/switch_image"
+       />
+
+    <ImageView
+        android:id="@+id/image_teste_cor2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:layout_below="@id/switch_image"
+        android:visibility="gone"
+        />
 </RelativeLayout>

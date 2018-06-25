@@ -64,7 +64,6 @@ public class LayoutScreen extends RelativeLayout {
         ( (FloatingActionButton)findViewById(R.id.atualizar) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_linked_camera_black_24dp));
         ( (FloatingActionButton)findViewById(R.id.salvar) ).setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
 
-
         fabRect = new Rect();
         viewCamera = new ImageView(context);
         inicialize();
@@ -127,6 +126,10 @@ public class LayoutScreen extends RelativeLayout {
 
     public Bitmap getBitmapMask(){
         return shape.getBtmpMask(shape.dados.getImgOri().getWidth(), shape.dados.getImgOri().getHeight());
+    }
+
+    public Bitmap getBitmapMask2(){
+        return shape.getBtmpMask2(shape.dados.getImgOri().getWidth(), shape.dados.getImgOri().getHeight());
     }
 
     public void setEventoContaGota(){

@@ -147,6 +147,18 @@ public abstract class Shapes extends Canvas{
         return btmp;
     }
 
+    public Bitmap getBtmpMask2(int width, int height){
+        Bitmap btmp = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.BLACK);
+
+        Canvas canvas = new Canvas(btmp);
+        canvas.drawRect(0, 0, width, height, paint);
+        canvas.drawBitmap(dados.getImgMask2(), dados.x, dados.y, null);
+        canvas.drawRect(dados.x, dados.y, dados.x + dados.width, dados.y + dados.height, paintInsideStroke);
+        return btmp;
+    }
+
     public Bitmap getBtmpShow(){
         return btmpShow;
     }

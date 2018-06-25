@@ -161,7 +161,7 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... params) {
             try {
-                /*client = server.accept();
+                client = server.accept();
                 client.setKeepAlive(true);
 
                 entrada = new DataInputStream(client.getInputStream());
@@ -175,8 +175,8 @@ public class ServiceSocket extends Service {
                 byte[] ret = new byte[length];
                 entrada.readFully(ret, 0, ret.length);
 
-                login = new String(ret, "UTF-8").split(";");*/
-                login = new String[]{"admin", "admin"};
+                login = new String(ret, "UTF-8").split(";");
+                //login = new String[]{"admin", "admin"};
                 client_connected = true;
                 return ServiceSocket.Status.SUCCESS;
             }catch (Exception e) {
@@ -211,7 +211,7 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... voids) {
             try {
-                /*byte[] msg = "get_all".getBytes();
+                byte[] msg = "get_all".getBytes();
                 saida.writeInt(msg.length);
                 saida.write(msg);
                 //saida.flush();
@@ -228,15 +228,20 @@ public class ServiceSocket extends Service {
                 byte[] img2 = new byte[length];
                 entrada.readFully(img2, 0, img2.length);
 
+                length = entrada.readInt();
+                byte[] img3 = new byte[length];
+                entrada.readFully(img3, 0, img3.length);
+
                 //BitmapFactory.decodeByteArray(img2, 0, img2.length, options)
                 //BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options);
                 dados = new ShapeDados(BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options),
                         BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, optionsMask),
+                        BitmapFactory.decodeStream(new ByteArrayInputStream(img3), null, optionsMask),
                         getResources().getDisplayMetrics().density,
                         new String(ret, "UTF-8")
-                );*/
+                );
 
-                String str = "limit_width:300\n" +
+                /*String str = "limit_width:300\n" +
                         "limit_height:300\n" +
                         "x:0\n" +
                         "y:0\n" +
@@ -244,9 +249,9 @@ public class ServiceSocket extends Service {
                         "height:100\n" +
                         "cor_rgb:152,55,12\n" +
                         "cor_hsv:152,69,2\n" +
-                        "altura:40\n" +
+                        "altura:40.0\n" +
                         "gain:-1\n" +
-                        "expo:8233.4234\n" +
+                        "expo:9233.0\n" +
                         "balance_temp:7500\n";
                 //BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options)
                 //BitmapFactory.decodeFile("/sdcard/image.bmp", options)
@@ -255,7 +260,7 @@ public class ServiceSocket extends Service {
                         getResources().getDisplayMetrics().density,
                         str
                         );
-
+*/
             } catch (Exception e) {
                 error = e.getMessage();
                 e.printStackTrace();
@@ -297,7 +302,7 @@ public class ServiceSocket extends Service {
         @Override
         protected ServiceSocket.Status doInBackground(Void... voids) {
             try {
-               /* byte[] msg =  "get_image".getBytes();
+                byte[] msg =  "get_image".getBytes();
                 saida.writeInt(msg.length);
                 saida.write(msg);
                 //saida.flush();
@@ -308,14 +313,20 @@ public class ServiceSocket extends Service {
 
                 length = entrada.readInt();
                 byte[] img2 = new byte[length];
-                entrada.readFully(img2, 0, img2.length);*/
+                entrada.readFully(img2, 0, img2.length);
+
+                length = entrada.readInt();
+                byte[] img3 = new byte[length];
+                entrada.readFully(img3, 0, img3.length);
 
                 options.inBitmap = dados.getImgOri();
-                dados.setImgOri( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options) );
-                //dados.setImgOri( BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options) );
+                //dados.setImgOri( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image, options) );
+                dados.setImgOri( BitmapFactory.decodeStream(new ByteArrayInputStream(img), null, options) );
 
-                dados.setImgMask( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image_mask, optionsMask) );
-                //dados.setImgMask( BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, optionsMask) );
+                //dados.setImgMask( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image_mask, optionsMask) );
+                //dados.setImgMask2( BitmapFactory.decodeResource(activity.getResources(), R.drawable.image_mask, optionsMask) );
+                dados.setImgMask( BitmapFactory.decodeStream(new ByteArrayInputStream(img2), null, optionsMask) );
+                dados.setImgMask2( BitmapFactory.decodeStream(new ByteArrayInputStream(img3), null, optionsMask) );
 
                 ((CameraActivity) activity).layoutScreen.newImage();
 
@@ -367,7 +378,7 @@ public class ServiceSocket extends Service {
                 String sDados = getStringConfig();
 
                 if( dados.check_save_config(sDados) ) {
-                   /* byte[] msg = "set_dados".getBytes();
+                    byte[] msg = "set_dados".getBytes();
                     saida.writeInt(msg.length);
                     saida.write(msg);
                     saida.flush();
@@ -387,9 +398,8 @@ public class ServiceSocket extends Service {
                     }else
                         return ServiceSocket.Status.INVALID;
 
-*/
-                    dados.setConfig(sDados);
-                    return ServiceSocket.Status.SUCCESS;
+                    //dados.setConfig(sDados);
+                    //return ServiceSocket.Status.SUCCESS;
                 }
 
                 return ServiceSocket.Status.NO_SAVE;
@@ -487,10 +497,10 @@ public class ServiceSocket extends Service {
         }else {
             sDados += "cor_hsv:-1,-1\n";
         }
-        sDados += "altura:" + Float.toString( dados.get_alturaCam() ) + ":\n";
+        sDados += "altura:" + Float.toString( dados.get_alturaCam() ) + "\n";
         sDados += "gain:"+ ( dados.gain_auto ? Integer.toString(-1): Float.toString(dados.gain) ) + "\n";
-        sDados += "expo:" + ( dados.exposure_auto ? Integer.toString(-1): Float.toString(dados.getExpo()) ) + "\n";
-        sDados += "balance_white_temp:"+ ( dados.balance_auto ? Integer.toString(-1): Integer.toString(dados.balance_temperature_value) )  + "\n";
+        sDados += "expo:" + ( dados.exposure_auto ? Integer.toString(-1): Float.toString(dados.getExpoMs() * 1000) ) + "\n";
+        sDados += "balance_temp:"+ ( dados.balance_auto ? Integer.toString(-1): Integer.toString(dados.balance_temperature_value) )  + "\n";
         return sDados;
     }
 

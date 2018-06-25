@@ -14,9 +14,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -158,16 +160,32 @@ public class CameraActivity extends AppCompatActivity{
         AlertDialog.Builder builder = new AlertDialog.Builder(ctw);
 
         final View view = getLayoutInflater().inflate( R.layout.dialog_teste_imagem, null);
+        final Switch swicth_img = (Switch) view.findViewById(R.id.switch_image);
         final ImageView imageV = (ImageView) view.findViewById(R.id.image_teste_cor);
+        final ImageView imageV2 = (ImageView) view.findViewById(R.id.image_teste_cor2);
+
         imageV.setImageBitmap(layoutScreen.getBitmapMask());
         imageV.invalidate();
+        imageV2.setImageBitmap(layoutScreen.getBitmapMask2());
+        imageV2.invalidate();
+
+        swicth_img.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    imageV.setVisibility(View.VISIBLE);
+                    imageV2.setVisibility(View.GONE);
+                }else{
+                    imageV.setVisibility(View.GONE);
+                    imageV2.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         builder.setTitle("Reconhecimento da Luva")
                 .setView(view)
                 .setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
                     }
                 })
                 .create().show();
